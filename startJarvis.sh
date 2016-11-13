@@ -27,7 +27,7 @@ echo "$JSON_BODY2" >> "$destdir"
 
 # Start Request
 echo "Start Request to JarvisBackend..." 
-curl -H "Content-Type:application/json" -H "Authorization:"$TOKEN -X POST -d @jsonBody.json http://gondor.selfhost.eu:8080/JarvisBackend/api/question/post -o test.json
+curl -H "Content-Type:application/json" -H "Authorization:"$TOKEN -X POST -d @jsonBody.json http:/IP:8080/JarvisBackend/api/question/post -o test.json
 
 # Ausgabe
 echo "Answer: "$(cat test.json)
