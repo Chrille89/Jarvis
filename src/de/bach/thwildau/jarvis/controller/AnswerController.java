@@ -30,6 +30,9 @@ import de.bach.thwildau.jarvis.model.GoogleRequest;
 import de.bach.thwildau.jarvis.model.GoogleResponse;
 import de.bach.thwildau.jarvis.operations.DateToday;
 import de.bach.thwildau.jarvis.operations.Function;
+import de.bach.thwildau.jarvis.operations.GameStarNews;
+import de.bach.thwildau.jarvis.operations.GameStarVideos;
+import de.bach.thwildau.jarvis.operations.TagesschauNews;
 import de.bach.thwildau.jarvis.operations.Time;
 
 @Path("/question")
@@ -49,6 +52,20 @@ public class AnswerController {
 			operations.put(prop.getProperty("question.date1"), DateToday.getInstance(prop.getProperty("answer.date")));
 			operations.put(prop.getProperty("question.date2"), DateToday.getInstance(prop.getProperty("answer.date")));
 			operations.put(prop.getProperty("question.date3"), DateToday.getInstance(prop.getProperty("answer.date")));
+			
+			operations.put(prop.getProperty("question.gamestarnews1"), GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
+			operations.put(prop.getProperty("question.gamestarnews2"), GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
+			operations.put(prop.getProperty("question.gamestarnews3"), GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
+			operations.put(prop.getProperty("question.gamestarnews4"), GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
+			operations.put(prop.getProperty("question.gamestarnews5"), GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
+		
+			operations.put(prop.getProperty("question.gamestarvideos1"), GameStarVideos.getInstance(prop.getProperty("answer.gamestarvideos")));
+			operations.put(prop.getProperty("question.gamestarvideos2"), GameStarVideos.getInstance(prop.getProperty("answer.gamestarvideos")));
+			
+			// Tagesschau
+			for(int i=1; i<22;i++){
+				operations.put(prop.getProperty("question.tagesschaunews"+String.valueOf(i)), TagesschauNews.getInstance(prop.getProperty("answer.tagesschau")));
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -91,7 +108,7 @@ public class AnswerController {
 			
 		Response response = invocationBuilder.post(Entity.entity(json, MediaType.APPLICATION_JSON));
 			
-		//Se Response.Status.OK;
+		//Set Response.Status.OK;
 		  if (response.getStatus() == 200) {
 			  GoogleResponse googleResponse = response.readEntity(GoogleResponse.class);
 		     
@@ -103,14 +120,13 @@ public class AnswerController {
 		        	String answer = function.operate();
 		        	return Response.ok(answer).build();
 		        } else {
-		        	 String error = prop.getProperty("question.notfound");
-					 return Response.ok(error).build();
+		        	 String cmdNotFound = prop.getProperty("question.notfound");
+					 return Response.ok(cmdNotFound).build();
 		        }
 		     }  
-			  String overflow = prop.getProperty("question.overflow");
-			  return Response.ok(overflow).build();
+			  return Response.ok("").build();
 		  }
-		  String error = prop.getProperty("question.error");
+		  String error = prop.getProperty("question.google.error");
 		  return Response.ok(error).build();
 	}    
 }
