@@ -61,7 +61,7 @@ public class GameStarNews implements Function {
 		        for(SyndEntryImpl feedEntry : entries){
 		        	scanner = new Scanner(feedEntry.getDescription().getValue());
 		        	
-		        	if(index > 10){
+		        	if(index > 5){
 		        		break;
 		        	}
 		        	

@@ -54,7 +54,7 @@ public class TagesschauNews implements Function {
 		        String news = "";
 		        
 		        for(SyndEntryImpl feedEntry : entries){  	
-		        	if(index > 10){
+		        	if(index > 5){
 		        		break;
 		        	}
 		        	String description = feedEntry.getDescription().getValue();
