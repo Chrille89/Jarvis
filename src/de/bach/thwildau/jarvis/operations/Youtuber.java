@@ -34,12 +34,12 @@ public class Youtuber implements Function {
 	@Override
 	public String operate() {
 		String googleToken = client.renewGoogleToken();
-		client.writeAnswer("Starte Youtube! Was möchtest du hören?");
 		startYoutube(googleToken);
 		return "Youtuber wurde beendet!";
 	}
 
 	private void startYoutube(String googleToken) {
+		client.writeAnswer("Was mÃ¶chtest du hoeren?");
 		String strAudio = client.recordingCommando();
 		String question = "";
 

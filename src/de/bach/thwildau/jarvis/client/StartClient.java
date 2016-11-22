@@ -2,16 +2,25 @@ package de.bach.thwildau.jarvis.client;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -20,9 +29,6 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.filter.LoggingFilter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,6 +54,8 @@ public class StartClient {
 
 	private Map<String, Function> operations;
 	private Properties prop;
+	private ExecutorService exe;
+	private Collection<Runnable> runnables;
 
 	/**
 	 * Constructor to initialize the Commandos
@@ -55,6 +63,8 @@ public class StartClient {
 	public StartClient(Map<String,Function> commandos, Properties prop) {
 		this.operations = commandos;
 		this.prop = prop;
+		exe = Executors.newCachedThreadPool();
+		runnables = new ArrayList<Runnable>();
 	}
 	
 	public StartClient(){}
@@ -72,13 +82,35 @@ public class StartClient {
 	 */
 	public void start(){
 		String token = renewGoogleToken();
-		this.writeAnswer("Ich bin nun bereit fuer dich!");
+	
 		while(true){
-		String audioCmd = recordingCommando();
-		Response response = startGoogleRequest(token, audioCmd);
-		String answer = handleRequest(response);
-		writeAnswer(answer);
+	    writeAnswer("Ich höre: ");
+	    
+	    Future<String> future = exe.submit(new Callable<String>() {
+
+			@Override
+			public String call() throws Exception {
+				String audioCmd = recordingCommando();
+				Response response = startGoogleRequest(token, audioCmd);
+				String answer = handleRequest(response);
+				return answer;
+			}
+	    });
+	    
+	    String answer = null;
+		try {
+			answer = future.get();
+			writeAnswer(answer);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+	 
+	  
+	}
 	}
 	
 
@@ -228,7 +260,7 @@ public class StartClient {
 		System.out.println("Answer: " + answer);
 		String cmd = "sudo ./answer.sh";
 		File file = new File("output.json");
-
+		
 		try {
 
 			if (file.exists()) {
@@ -236,7 +268,7 @@ public class StartClient {
 			}
 
 			if (file.createNewFile()) {
-				FileWriter writer = new FileWriter(file.getAbsolutePath());
+				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file),"UTF-8");
 				BufferedWriter buffWriter = new BufferedWriter(writer);
 				buffWriter.write(answer);
 				buffWriter.close();
