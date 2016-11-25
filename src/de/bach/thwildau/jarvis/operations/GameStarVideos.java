@@ -61,7 +61,7 @@ public class GameStarVideos implements Function {
 			for (SyndEntryImpl feedEntry : entries) {
 				scanner = new Scanner(feedEntry.getDescription().getValue());
 
-				if (index > 5) {
+				if (index > 3) {
 					break;
 				}
 
