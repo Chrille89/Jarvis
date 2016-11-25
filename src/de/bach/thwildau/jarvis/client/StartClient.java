@@ -14,13 +14,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Queue;
 import java.util.Scanner;
+import java.util.Stack;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -38,6 +43,7 @@ import de.bach.thwildau.jarvis.client.model.Config;
 import de.bach.thwildau.jarvis.client.model.GoogleRequest;
 import de.bach.thwildau.jarvis.model.GoogleResponse;
 import de.bach.thwildau.jarvis.operations.DateToday;
+import de.bach.thwildau.jarvis.operations.EmulationStation;
 import de.bach.thwildau.jarvis.operations.Function;
 import de.bach.thwildau.jarvis.operations.GameStarNews;
 import de.bach.thwildau.jarvis.operations.GameStarVideos;
@@ -55,7 +61,6 @@ public class StartClient {
 	private Map<String, Function> operations;
 	private Properties prop;
 	private ExecutorService exe;
-	private Collection<Runnable> runnables;
 
 	/**
 	 * Constructor to initialize the Commandos
@@ -64,7 +69,6 @@ public class StartClient {
 		this.operations = commandos;
 		this.prop = prop;
 		exe = Executors.newCachedThreadPool();
-		runnables = new ArrayList<Runnable>();
 	}
 	
 	public StartClient(){}
@@ -84,42 +88,35 @@ public class StartClient {
 		String token = renewGoogleToken();
 	
 		while(true){
-	    writeAnswer("Ich höre: ");
-	    
-	    Future<String> future = exe.submit(new Callable<String>() {
+		playRecordingSound();
+	    String audioCmd = recordingCommando();
+	    Response response = startGoogleRequest(token, audioCmd);
+	  	String answer = handleRequest(response);
+	  	this.writeAnswer(answer);
+	  }
+	}
 
-			@Override
-			public String call() throws Exception {
-				String audioCmd = recordingCommando();
-				Response response = startGoogleRequest(token, audioCmd);
-				String answer = handleRequest(response);
-				return answer;
-			}
-	    });
-	    
-	    String answer = null;
+
+	private void playRecordingSound() {
+		String cmd = "sudo ./playRecordingSound.sh";
+		
 		try {
-			answer = future.get();
-			writeAnswer(answer);
+			Runtime.getRuntime().exec(cmd).waitFor();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-	 
-	  
 	}
-	}
-	
 
 	/*
 	 * Get a new Google-Token
 	 */
 	public String renewGoogleToken() {
 		System.out.println("Generate Token...");
-		String cmd = "sudo ./renewToken.sh";
+		String cmd = "./renewToken.sh";
 		String token = "";
 		try {
 			Runtime.getRuntime().exec(cmd).waitFor();
@@ -230,7 +227,7 @@ public class StartClient {
 		if (response.getStatus() == 200) {
 			System.out.println("Google send Status 200 ;-) ");
 			GoogleResponse googleResponse = response.readEntity(GoogleResponse.class);
-
+			
 			if (googleResponse.getResults().size() == 1) {
 				String question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
 				System.out.println("Question: "+question);
@@ -245,12 +242,13 @@ public class StartClient {
 			}
 		} else {
 			// renew Token!
+			System.out.println("Google send: "+response.getStatus()+ " :-(");
+			System.out.println(response);
 			String newToken = renewGoogleToken();
 			String strAudio = recordingCommando();
 			handleRequest(startGoogleRequest(newToken, strAudio));
 		}
 		return answer;
-
 	}
 
 	/*
@@ -334,6 +332,12 @@ public class StartClient {
 			for (int i = 1; i < 22; i++) {
 				operations.put(prop.getProperty("question.tagesschaunews" + String.valueOf(i)),
 						TagesschauNews.getInstance(prop.getProperty("answer.tagesschau")));
+			}
+			
+			// EmulationStation
+			for (int i = 1; i < 14; i++) {
+				operations.put(prop.getProperty("question.retropie.start" + String.valueOf(i)),
+						EmulationStation.getInstance(prop.getProperty("answer.retropie.start")));
 			}
 			StartClient client = new StartClient(operations,prop);
 			client.start();
