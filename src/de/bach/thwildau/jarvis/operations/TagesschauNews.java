@@ -51,17 +51,12 @@ public class TagesschauNews implements Function {
 			SyndFeed feed = input.build(source);
 			List<SyndEntryImpl> entries = feed.getEntries();
 
-			int index = 0;
 			String news = "";
 
 			for (SyndEntryImpl feedEntry : entries) {
-				if (index > 3) {
-					break;
-				}
 				String description = feedEntry.getDescription().getValue();
 				news +=" ";
 				news += description;
-				index++;
 			}
 			return news;
 		} catch (MalformedURLException e) {

@@ -52,18 +52,13 @@ public class GameStarVideos implements Function {
 			SyndFeedInput input = new SyndFeedInput();
 			SyndFeed feed = input.build(source);
 			List<SyndEntryImpl> entries = feed.getEntries();
-
-			int index = 0;
+			
 			String news = "";
 
 			Scanner scanner;
 
 			for (SyndEntryImpl feedEntry : entries) {
 				scanner = new Scanner(feedEntry.getDescription().getValue());
-
-				if (index > 3) {
-					break;
-				}
 
 				if (scanner.hasNextLine()) {
 					scanner.nextLine();
@@ -72,7 +67,6 @@ public class GameStarVideos implements Function {
 					String description = scanner.nextLine();
 					news +=" ";
 					news += description;
-					index++;
 				}
 
 			}

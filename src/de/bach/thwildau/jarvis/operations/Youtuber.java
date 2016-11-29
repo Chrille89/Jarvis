@@ -33,7 +33,7 @@ public class Youtuber implements Function {
 
 	@Override
 	public String operate() {
-		String googleToken = client.renewGoogleToken();
+		String googleToken = client.getGoogleToken();
 		startYoutube(googleToken);
 		return "Youtuber wurde beendet!";
 	}
@@ -58,46 +58,18 @@ public class Youtuber implements Function {
 				e1.printStackTrace();
 			}
 
-			if (googleResponse.getResults().size() == 1) {
+			if (googleResponse.getResults().size() > 0) {
 				question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
 				System.out.println("Question: " + question);
 				if (question.equalsIgnoreCase("YouTube beenden")) {
 					System.out.println("Beende Youtube!");
 					return;
 				}
-				
-				String cmd="";
+				String cmd = null;
 				try {
-					String path = question.replaceAll("\\s+","") + ".mp4";
-					File file = new File(path);
-					
-					File questionFile = new File("question.txt");
-					
-					if(questionFile.exists()){
-						questionFile.delete();
-						questionFile.createNewFile();
-					} else {
-						questionFile.createNewFile();
-					}
-					
-					FileWriter writer = new FileWriter(questionFile);
-					BufferedWriter bufferedWriter = new BufferedWriter(writer);
-					
-					bufferedWriter.write(question);
-					
-					bufferedWriter.close();
-					
-					if (file.exists()) {
-						System.out.println("File is already downloaded! I play it...");
-						cmd = "./playYoutubeVideo.sh " +path;
-						System.out.println("Execute Command: " + cmd);
-						Runtime.getRuntime().exec(cmd).waitFor();
-					} else {
-						System.out.println("File isn't downloaded! I load it...");
-						cmd = "./downloadAndPlayYoutubeVideo.sh " + path;
-						System.out.println("Execute Command " + cmd);
-						Runtime.getRuntime().exec(cmd).waitFor();
-					}
+					cmd = "sudo ./downloadAndPlayYoutubeVideo.sh " + question;
+					System.out.println("Execute Command " + cmd);
+					Runtime.getRuntime().exec(cmd).waitFor();
 				} catch (IOException e) {
 					System.err.println("Error execute commando '" + cmd + "'");
 					e.printStackTrace();
@@ -109,7 +81,8 @@ public class Youtuber implements Function {
 			// es wurde nichts gesagt -> weiter bis 'YouTube beenden'
 			startYoutube(googleToken);
 		} else {
-			String newToken = client.renewGoogleToken();
+			// kein 200-Status -> nochmal versuchen!
+			String newToken = client.getGoogleToken();
 			startYoutube(newToken);
 		}
 

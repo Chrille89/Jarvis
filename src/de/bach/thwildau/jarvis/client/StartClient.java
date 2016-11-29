@@ -61,7 +61,8 @@ public class StartClient {
 	private Map<String, Function> operations;
 	private Properties prop;
 	private ExecutorService exe;
-
+	private int index = 0;
+	
 	/**
 	 * Constructor to initialize the Commandos
 	 */
@@ -85,14 +86,15 @@ public class StartClient {
 	 *		</ul>
 	 */
 	public void start(){
-		String token = renewGoogleToken();
-	
+		String token = getGoogleToken();
 		while(true){
-		playRecordingSound();
-	    String audioCmd = recordingCommando();
-	    Response response = startGoogleRequest(token, audioCmd);
-	  	String answer = handleRequest(response);
-	  	this.writeAnswer(answer);
+		//playRecordingSound();
+	
+			String audioCmd = recordingCommando();
+			Response response = startGoogleRequest(token, audioCmd);
+			String answer = handleRequest(response);
+			this.writeAnswer(answer);
+			index++;
 	  }
 	}
 
@@ -114,34 +116,23 @@ public class StartClient {
 	/*
 	 * Get a new Google-Token
 	 */
-	public String renewGoogleToken() {
-		System.out.println("Generate Token...");
-		String cmd = "./renewToken.sh";
+	public String getGoogleToken() {
+		System.out.println("Load Token...");
 		String token = "";
+		// Token einlesen
+		File file = new File("/home/pi/Jarvis/googleToken.json");
+
 		try {
-			Runtime.getRuntime().exec(cmd).waitFor();
-
-			// Token einlesen
-			File file = new File("/home/pi/Jarvis/googleToken.json");
-
-			try {
-				Scanner scanner = new Scanner(file);
-				while (scanner.hasNext()) {
-					token += scanner.next();
-				}
-				scanner.close();
-			} catch (FileNotFoundException e) {
-				System.err.println("Error reading Token!");
-				e.printStackTrace();
+			Scanner scanner = new Scanner(file);
+			while (scanner.hasNext()) {
+				token += scanner.next();
 			}
-			System.out.println("Done.");
-		} catch (InterruptedException e) {
-			System.err.println("Error execute commando '" + cmd + "'");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.err.println("Error execute commando '" + cmd + "'");
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			System.err.println("Error reading Token!");
 			e.printStackTrace();
 		}
+		System.out.println("Done.");
 
 		return token;
 	}
@@ -191,7 +182,7 @@ public class StartClient {
 	public Response startGoogleRequest(String token, String audioString) {
 		// Request erzeugen und an das Backend senden
 		System.out.println("Create Request to Google...");
-
+		Response response = null;
 		Audio audio = new Audio(audioString, null);
 		Config config = new Config("FLAC", "16000", "de-DE", null);
 		GoogleRequest googleRequest = new GoogleRequest(config, audio, null);
@@ -208,12 +199,17 @@ public class StartClient {
 			System.err.println("Error parsing GoogleRequest-Class to JSON-Format!");
 			e.printStackTrace();
 		}
-
+		
+		try{
 		Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON)
 				.header("Content-Type", "application/json").header("Authorization", "Bearer " + token);
 
-		Response response = invocationBuilder.post(Entity.entity(json, MediaType.APPLICATION_JSON));
-
+		response = invocationBuilder.post(Entity.entity(json, MediaType.APPLICATION_JSON));
+		} catch(Exception e){
+			System.err.println("Error in Request "+index+". Try again...");
+			index = 0;
+			startGoogleRequest(token, audioString);
+		}
 		return response;
 	}
 	
@@ -222,6 +218,7 @@ public class StartClient {
 	 * If the token is invalid, renew the token and start the googleRequest again!
 	 */
 	private String handleRequest(Response response){
+		System.out.println("Request number: "+index);
 		String answer ="";
 		// Se Response.Status.OK;
 		if (response.getStatus() == 200) {
@@ -244,7 +241,8 @@ public class StartClient {
 			// renew Token!
 			System.out.println("Google send: "+response.getStatus()+ " :-(");
 			System.out.println(response);
-			String newToken = renewGoogleToken();
+			writeAnswer("Es ist ein Fehler in der Abarbeitung der "+index+".HTTP-Anfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: "+response.getStatus());
+			String newToken = getGoogleToken();
 			String strAudio = recordingCommando();
 			handleRequest(startGoogleRequest(newToken, strAudio));
 		}
