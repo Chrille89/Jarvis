@@ -4,28 +4,16 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Queue;
 import java.util.Scanner;
-import java.util.Stack;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -90,8 +78,36 @@ public class StartClient {
 		while(true){
 		//playRecordingSound();
 	
+			if(index > 100){
+				try {
+					// warte 16 min.
+					System.out.println("Warte 16 Minuten...");
+					writeAnswer("Da du mich im Moment nicht brauchst, schalte ich jetzt für 15 Minuten ab!");
+					writeLog("DEBUG: ","Warte 16 Minuten...");
+					Thread.sleep(1000000);
+					index = 0;
+					token = getGoogleToken();
+				} catch (InterruptedException e) {
+					writeLog("ERROR: ", "GoogleToken konnte nicht erneuert werden!" +e.getMessage());
+					e.printStackTrace();
+				}
+			}
+			
 			String audioCmd = recordingCommando();
 			Response response = startGoogleRequest(token, audioCmd);
+			
+			while(response == null){
+				try {
+					Thread.sleep(30000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				index = 0;
+			    audioCmd = recordingCommando();
+				token = getGoogleToken();
+				response = startGoogleRequest(token, audioCmd);
+			}
+			
 			String answer = handleRequest(response);
 			this.writeAnswer(answer);
 			index++;
@@ -129,12 +145,37 @@ public class StartClient {
 			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
+			writeLog("ERROR: ","Error reading Token!"+e.getMessage());
 			System.err.println("Error reading Token!");
 			e.printStackTrace();
 		}
 		System.out.println("Done.");
 
 		return token;
+	}
+
+	private void writeLog(String level, String message) {
+		
+		File errorLogFile = new File("logs/error.log");
+		Date date = new Date();
+		
+		try {
+			
+			if(!errorLogFile.exists()){
+				errorLogFile.createNewFile();
+			}
+			OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(errorLogFile),"UTF-8");
+			BufferedWriter buffWriter = new BufferedWriter(writer);
+			
+			buffWriter.write(date.toString()+" "+level+" "+message);
+			buffWriter.close();
+			writer.close();
+		} catch (IOException e) {
+			System.err.println("Das Log-File konnte nicht geschrieben werden!");
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	/*
@@ -205,11 +246,12 @@ public class StartClient {
 				.header("Content-Type", "application/json").header("Authorization", "Bearer " + token);
 
 		response = invocationBuilder.post(Entity.entity(json, MediaType.APPLICATION_JSON));
-		} catch(Exception e){
+		} catch(Exception e){  
+			writeLog("ERROR: ", "Error in Request "+index+". Try again..."+e.getMessage());
 			System.err.println("Error in Request "+index+". Try again...");
-			index = 0;
-			startGoogleRequest(token, audioString);
+			return null;
 		}
+		
 		return response;
 	}
 	
@@ -231,6 +273,7 @@ public class StartClient {
 				if (operations.get(question) != null) {
 					Function function = operations.get(question);
 					answer = function.operate();
+					index = 0;
 					return answer;
 				} else {
 					String error = prop.getProperty("question.notfound");
@@ -241,6 +284,7 @@ public class StartClient {
 			// renew Token!
 			System.out.println("Google send: "+response.getStatus()+ " :-(");
 			System.out.println(response);
+			writeLog("INFO: ", "Es ist ein Fehler in der Abarbeitung der "+index+".HTTP-Anfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: "+response.getStatus());
 			writeAnswer("Es ist ein Fehler in der Abarbeitung der "+index+".HTTP-Anfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: "+response.getStatus());
 			String newToken = getGoogleToken();
 			String strAudio = recordingCommando();
@@ -253,7 +297,6 @@ public class StartClient {
 	 * Write the Answer in a File.
 	 */
 	public void writeAnswer(String answer) {
-		System.out.println("Answer: " + answer);
 		String cmd = "sudo ./answer.sh";
 		File file = new File("output.json");
 		
