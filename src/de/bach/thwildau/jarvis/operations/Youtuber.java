@@ -34,12 +34,12 @@ public class Youtuber implements Function {
 	@Override
 	public String operate() {
 		String googleToken = client.getGoogleToken();
+		client.writeAnswer("Was möchtest du hören?");
 		startYoutube(googleToken);
 		return "Youtuber wurde beendet!";
 	}
 
 	private void startYoutube(String googleToken) {
-		client.writeAnswer("Was möchtest du hoeren?");
 		String strAudio = client.recordingCommando();
 		String question = "";
 
@@ -58,18 +58,40 @@ public class Youtuber implements Function {
 				e1.printStackTrace();
 			}
 
-			if (googleResponse.getResults().size() > 0) {
+			if (googleResponse.getResults().size() == 1) {
 				question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
 				System.out.println("Question: " + question);
 				if (question.equalsIgnoreCase("YouTube beenden")) {
 					System.out.println("Beende Youtube!");
 					return;
 				}
-				String cmd = null;
+
+				String cmd = "";
 				try {
-					cmd = "sudo ./downloadAndPlayYoutubeVideo.sh " + question;
+
+					File questionFile = new File("song.json");
+
+					if (questionFile.exists()) {
+						questionFile.delete();
+						questionFile.createNewFile();
+					} else {
+						questionFile.createNewFile();
+					}
+
+					FileWriter writer = new FileWriter(questionFile);
+					BufferedWriter bufferedWriter = new BufferedWriter(writer);
+
+					bufferedWriter.write(question);
+					bufferedWriter.close();
+
+					String file = question.replaceAll("\\s+", "") + ".mp4";
+
+					System.out.println("I load it the youtube-File");
+					cmd = "./playYoutubeVideo.sh " + file;
 					System.out.println("Execute Command " + cmd);
+
 					Runtime.getRuntime().exec(cmd).waitFor();
+
 				} catch (IOException e) {
 					System.err.println("Error execute commando '" + cmd + "'");
 					e.printStackTrace();
@@ -81,7 +103,6 @@ public class Youtuber implements Function {
 			// es wurde nichts gesagt -> weiter bis 'YouTube beenden'
 			startYoutube(googleToken);
 		} else {
-			// kein 200-Status -> nochmal versuchen!
 			String newToken = client.getGoogleToken();
 			startYoutube(newToken);
 		}

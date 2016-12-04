@@ -59,7 +59,7 @@ public class TagesschauNews implements Function {
 				news += description;
 			}
 			
-			Runtime.getRuntime().exec("sudo ./playTagesschauIntro.sh");
+			Runtime.getRuntime().exec("./playTagesschauIntro.sh").waitFor();
 			
 			return news;
 		} catch (MalformedURLException e) {
@@ -72,6 +72,9 @@ public class TagesschauNews implements Function {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
