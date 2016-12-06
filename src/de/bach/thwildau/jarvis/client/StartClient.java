@@ -37,6 +37,7 @@ import de.bach.thwildau.jarvis.operations.GameStarNews;
 import de.bach.thwildau.jarvis.operations.GameStarVideos;
 import de.bach.thwildau.jarvis.operations.TagesschauNews;
 import de.bach.thwildau.jarvis.operations.Time;
+import de.bach.thwildau.jarvis.operations.WikipediaTracer;
 import de.bach.thwildau.jarvis.operations.Youtuber;
 
 /**
@@ -154,7 +155,7 @@ public class StartClient {
 		return token;
 	}
 
-	private void writeLog(String level, String message) {
+	public void writeLog(String level, String message) {
 		
 		File errorLogFile = new File("logs/error.log");
 		Date date = new Date();
@@ -369,6 +370,15 @@ public class StartClient {
 			operations.put(prop.getProperty("question.youtube5"),
 					Youtuber.getInstance(new StartClient()));
 
+			operations.put(prop.getProperty("question.wikipedia1"),
+					WikipediaTracer.getInstance(new StartClient()));
+			operations.put(prop.getProperty("question.wikipedia2"),
+					WikipediaTracer.getInstance(new StartClient()));
+			operations.put(prop.getProperty("question.wikipedia3"),
+					WikipediaTracer.getInstance(new StartClient()));
+			operations.put(prop.getProperty("question.wikipedia4"),
+					WikipediaTracer.getInstance(new StartClient()));
+			
 			// Tagesschau
 			for (int i = 1; i < 22; i++) {
 				operations.put(prop.getProperty("question.tagesschaunews" + String.valueOf(i)),
