@@ -58,7 +58,7 @@ public class Youtuber implements Function {
 				e1.printStackTrace();
 			}
 
-			if (googleResponse.getResults().size() == 1) {
+			if (googleResponse.getResults().size() > 1) {
 				question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
 				System.out.println("Question: " + question);
 				if (question.equalsIgnoreCase("YouTube beenden")) {
