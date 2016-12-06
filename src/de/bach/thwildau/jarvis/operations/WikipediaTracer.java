@@ -1,34 +1,28 @@
 package de.bach.thwildau.jarvis.operations;
 
-import java.io.BufferedOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Scanner;
+import java.util.Map;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import de.bach.thwildau.jarvis.client.StartClient;
 import de.bach.thwildau.jarvis.model.GoogleResponse;
-import sun.awt.CharsetString;
 
 public class WikipediaTracer implements Function {
 
 	private static final String searchUrl = "https://de.wikipedia.org/w/api.php";
 
 	private static WikipediaTracer instance;
-	private String answer = null;
 	private StartClient client = null;
 
 	private WikipediaTracer(StartClient client) {
@@ -47,19 +41,21 @@ public class WikipediaTracer implements Function {
 	@Override
 	public String operate() {
 		String googleToken = client.getGoogleToken();
+		client.writeAnswer("Welchen Begriff soll ich für dich nachschlagen?");
+		String result = startWikipedia(googleToken);
 
-		List<String> results = startWikipedia(googleToken);
-
-		return results.get(1);
+		return result;
 
 	}
 
-	private List<String> startWikipedia(String googleToken) {
+	private String startWikipedia(String googleToken) {
 		String strAudio = client.recordingCommando();
 		String question = "";
 
 		Response response = client.startGoogleRequest(googleToken, strAudio);
 
+		String result = "";
+		
 		if (response.getStatus() == 200) {
 			System.out.println("Google send Status 200 ;-)");
 			GoogleResponse googleResponse = response.readEntity(GoogleResponse.class);
@@ -73,55 +69,45 @@ public class WikipediaTracer implements Function {
 				e1.printStackTrace();
 			}
 
-			if (googleResponse.getResults().size() == 1) {
+			if (googleResponse.getResults().size() > 0) {
 				question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
 				System.out.println("Question: " + question);
-				if (question.equalsIgnoreCase("Wikipedia beenden")) {
-					System.out.println("Beende Wikipedia!");
-					return null;
-				}
-				List<String> results = startWikipediaRequest(question);
-				return results;
-
+				result = startWikipediaRequest(question);
+				return result;
 			}
-
+		} else {
+			// renew Token!
+			System.out.println("Google send: " + response.getStatus() + " :-(");
+			System.out.println(response);
+			client.writeLog("INFO: ", "Es ist ein Fehler in der Abarbeitung der Wikipedia-Abfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: " + response.getStatus());
+			client.writeAnswer("Es ist ein Fehler in der Abarbeitung der Wikipedia-Abfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: " + response.getStatus());
 		}
-		return null;
+		return result;
 	}
 
-	public List<String> startWikipediaRequest(String question) {
-
-		List<List<String>> results = null;
-
+	public String startWikipediaRequest(String question) {
 		Client client = ClientBuilder.newClient();
-		WebTarget webTarget = client.target(searchUrl).path("?action=opensearch&search=Donald_Trump&format=json&callback=?");
+		WebTarget webTarget = client.target(searchUrl)
+				.path("?uselang=de&action=opensearch&search=" + question + "&format=json");
 
 		try {
-			Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON).header("Content-Type", "application/json;charset=UTF-8");
+			Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON_TYPE)
+					.accept(MediaType.APPLICATION_JSON_TYPE).header("Content-Type", "application/json");
 
-			Response response = invocationBuilder.get();
-			
-			Scanner scanner = new Scanner((InputStream) response.getEntity(),"utf-8");
-			System.out.println(Charset.availableCharsets());
-			while(scanner.hasNext()){
-				String s = new String(scanner.next().getBytes(),Charset.forName("UTF-8"));
-				System.out.println(s);
-			}
-			
-	
-			for(List<String> l : results){
-				for(String s : l){
-					System.out.println(s);
-				}
-			}
-			
-			return null;
+			String res = invocationBuilder.get(String.class);
+
+			JsonParser jp = new JsonParser();
+			JsonElement je = jp.parse(res);
+			JsonArray array = je.getAsJsonArray();
+
+			String answer = array.get(2).toString().replace("[", "").replace("]", "");
+			System.out.println(answer);
+			return answer;
 		} catch (Exception e) {
-			// writeLog("ERROR: ", "Error in Request "+index+". Try again..."+e.getMessage());
 			System.err.println("Error in Wikipedia-Request!");
 			e.printStackTrace();
-			return null;
 		}
+		return null;
 
 	}
 }
