@@ -20,14 +20,18 @@ public class EmulationStation implements Function {
 			return instance;
 		}
 	}
+	
 	@Override
 	public String operate() {
 		String cmd = "./startEmulationStation.sh";
-		
+		String error = "Konnte die Spielekonsole nicht starten!";
 		try {
-			Runtime.getRuntime().exec(cmd);
-		} catch (IOException e) {
-			String error = "Konnte die Spielekonsole nicht starten!";
+			Runtime.getRuntime().exec(cmd).waitFor();
+		} catch (IOException e) {	
+			System.err.println(error);
+			e.printStackTrace();
+			return error;
+		} catch (InterruptedException e) {
 			System.err.println(error);
 			e.printStackTrace();
 			return error;
