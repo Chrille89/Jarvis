@@ -35,6 +35,7 @@ import de.bach.thwildau.jarvis.operations.EmulationStation;
 import de.bach.thwildau.jarvis.operations.Function;
 import de.bach.thwildau.jarvis.operations.GameStarNews;
 import de.bach.thwildau.jarvis.operations.GameStarVideos;
+import de.bach.thwildau.jarvis.operations.JobTicker;
 import de.bach.thwildau.jarvis.operations.TagesschauNews;
 import de.bach.thwildau.jarvis.operations.Time;
 import de.bach.thwildau.jarvis.operations.WikipediaTracer;
@@ -49,7 +50,6 @@ public class StartClient {
 
 	private Map<String, Function> operations;
 	private Properties prop;
-	private ExecutorService exe;
 	private int index = 0;
 	
 	/**
@@ -58,7 +58,6 @@ public class StartClient {
 	public StartClient(Map<String,Function> commandos, Properties prop) {
 		this.operations = commandos;
 		this.prop = prop;
-		exe = Executors.newCachedThreadPool();
 	}
 	
 	public StartClient(){}
@@ -110,6 +109,7 @@ public class StartClient {
 			}
 			
 			String answer = handleRequest(response);
+			System.out.println(answer);
 			this.writeAnswer(answer);
 			index++;
 	  }
@@ -338,46 +338,39 @@ public class StartClient {
 			
 			Map<String,Function> operations = new HashMap<>();
 			
-			operations.put(prop.getProperty("question.time1"), Time.getInstance(prop.getProperty("answer.time")));
-			operations.put(prop.getProperty("question.time2"), Time.getInstance(prop.getProperty("answer.time")));
-			operations.put(prop.getProperty("question.date1"), DateToday.getInstance(prop.getProperty("answer.date")));
-			operations.put(prop.getProperty("question.date2"), DateToday.getInstance(prop.getProperty("answer.date")));
-			operations.put(prop.getProperty("question.date3"), DateToday.getInstance(prop.getProperty("answer.date")));
-
-			operations.put(prop.getProperty("question.gamestarnews1"),
-					GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
-			operations.put(prop.getProperty("question.gamestarnews2"),
-					GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
-			operations.put(prop.getProperty("question.gamestarnews3"),
-					GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
-			operations.put(prop.getProperty("question.gamestarnews4"),
-					GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
-			operations.put(prop.getProperty("question.gamestarnews5"),
-					GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
-
-			operations.put(prop.getProperty("question.gamestarvideos1"),
-					GameStarVideos.getInstance(prop.getProperty("answer.gamestarvideos")));
-			operations.put(prop.getProperty("question.gamestarvideos2"),
-					GameStarVideos.getInstance(prop.getProperty("answer.gamestarvideos")));
-			operations.put(prop.getProperty("question.youtube1"),
-					Youtuber.getInstance(new StartClient()));
-			operations.put(prop.getProperty("question.youtube2"),
-					Youtuber.getInstance(new StartClient()));
-			operations.put(prop.getProperty("question.youtube3"),
-					Youtuber.getInstance(new StartClient()));
-			operations.put(prop.getProperty("question.youtube4"),
-					Youtuber.getInstance(new StartClient()));
-			operations.put(prop.getProperty("question.youtube5"),
-					Youtuber.getInstance(new StartClient()));
-
-			operations.put(prop.getProperty("question.wikipedia1"),
+			// Time
+			for(int i=1;i<3;i++){
+				operations.put(prop.getProperty("question.time"+String.valueOf(i)), Time.getInstance(prop.getProperty("answer.time")));
+			}
+			
+			// Date
+			for(int i=1;i<4;i++){
+				operations.put(prop.getProperty("question.date"+String.valueOf(i)), DateToday.getInstance(prop.getProperty("answer.date")));
+			}
+			
+			// Gamestar-News
+			for(int i=1; i < 6 ; i++){
+				operations.put(prop.getProperty("question.gamestarnews"+String.valueOf(i)),
+						GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
+			}
+			
+			// Gamestar-Videos
+			for(int i=1; i<3;i++){
+				operations.put(prop.getProperty("question.gamestarvideos"+String.valueOf(i)),
+						GameStarVideos.getInstance(prop.getProperty("answer.gamestarvideos")));
+			}
+	
+			// Youtube
+			for(int i=1; i<6;i++){
+				operations.put(prop.getProperty("question.youtube"+String.valueOf(i)),
+						Youtuber.getInstance(new StartClient()));
+			}
+			
+			// Wikipedia
+			for(int i=1; i < 5 ; i++){
+			operations.put(prop.getProperty("question.wikipedia"+String.valueOf(i)),
 					WikipediaTracer.getInstance(new StartClient()));
-			operations.put(prop.getProperty("question.wikipedia2"),
-					WikipediaTracer.getInstance(new StartClient()));
-			operations.put(prop.getProperty("question.wikipedia3"),
-					WikipediaTracer.getInstance(new StartClient()));
-			operations.put(prop.getProperty("question.wikipedia4"),
-					WikipediaTracer.getInstance(new StartClient()));
+			}
 			
 			// Tagesschau
 			for (int i = 1; i < 22; i++) {
@@ -390,6 +383,13 @@ public class StartClient {
 				operations.put(prop.getProperty("question.retropie.start" + String.valueOf(i)),
 						EmulationStation.getInstance(prop.getProperty("answer.retropie.start")));
 			}
+			
+			// JobTicker
+			for (int i = 1; i < 11; i++) {
+					operations.put(prop.getProperty("question.job" + String.valueOf(i)),
+					JobTicker.getInstance(prop.getProperty("answer.job")));
+			}
+			
 			StartClient client = new StartClient(operations,prop);
 			client.start();
 		} catch (IOException e) {
