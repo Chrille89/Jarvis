@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -31,7 +29,6 @@ import de.bach.thwildau.jarvis.client.model.Config;
 import de.bach.thwildau.jarvis.client.model.GoogleRequest;
 import de.bach.thwildau.jarvis.model.GoogleResponse;
 import de.bach.thwildau.jarvis.operations.DateToday;
-import de.bach.thwildau.jarvis.operations.EmulationStation;
 import de.bach.thwildau.jarvis.operations.Function;
 import de.bach.thwildau.jarvis.operations.GameStarNews;
 import de.bach.thwildau.jarvis.operations.GameStarVideos;
@@ -376,12 +373,6 @@ public class StartClient {
 			for (int i = 1; i < 22; i++) {
 				operations.put(prop.getProperty("question.tagesschaunews" + String.valueOf(i)),
 						TagesschauNews.getInstance(prop.getProperty("answer.tagesschau")));
-			}
-			
-			// EmulationStation
-			for (int i = 1; i < 14; i++) {
-				operations.put(prop.getProperty("question.retropie.start" + String.valueOf(i)),
-						EmulationStation.getInstance(prop.getProperty("answer.retropie.start")));
 			}
 			
 			// JobTicker
