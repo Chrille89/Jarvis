@@ -27,15 +27,15 @@ public class EmulationStation implements Function {
 		String error = "Konnte die Spielekonsole nicht starten!";
 		try {
 			Runtime.getRuntime().exec(cmd).waitFor();
+			System.exit(0);
 		} catch (IOException e) {	
 			System.err.println(error);
 			e.printStackTrace();
 			return error;
 		} catch (InterruptedException e) {
-			System.err.println(error);
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return error;
-		}
+		} 
 		
 		return this.answer;
 	}

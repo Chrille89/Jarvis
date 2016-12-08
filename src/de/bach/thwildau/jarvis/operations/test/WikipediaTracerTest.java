@@ -1,8 +1,9 @@
-package de.bach.thwildau.jarvis.operations;
+package de.bach.thwildau.jarvis.operations.test;
 
 import org.junit.Test;
 
 import de.bach.thwildau.jarvis.client.StartClient;
+import de.bach.thwildau.jarvis.operations.WikipediaTracer;
 
 public class WikipediaTracerTest {
 
