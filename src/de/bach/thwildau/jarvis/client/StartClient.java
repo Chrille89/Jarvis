@@ -268,7 +268,14 @@ public class StartClient {
 			if (googleResponse.getResults().size() == 1) {
 				String question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
 				System.out.println("Question: "+question);
-				if (operations.get(question) != null) {
+				
+				// Sprachsteuerung beenden
+				if(question.equals("Sprachsteuerung deaktivieren")){
+					this.writeAnswer("Bis zum nächsten mal Christian! Ich hoffe wir reden später wieder?");
+					System.exit(0);
+				}
+				
+				if (operations.get(question) != null) {	
 					Function function = operations.get(question);
 					answer = function.operate();
 					index = 0;
