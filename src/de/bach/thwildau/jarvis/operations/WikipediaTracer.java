@@ -86,6 +86,7 @@ public class WikipediaTracer implements Function {
 	}
 
 	public String startWikipediaRequest(String question) {
+		
 		Client client = ClientBuilder.newClient();
 		WebTarget webTarget = client.target(searchUrl)
 				.path("?uselang=de&action=opensearch&search=" + question + "&format=json");
