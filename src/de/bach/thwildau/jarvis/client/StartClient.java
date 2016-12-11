@@ -37,6 +37,7 @@ import de.bach.thwildau.jarvis.operations.GermanyTraffic;
 import de.bach.thwildau.jarvis.operations.JobTicker;
 import de.bach.thwildau.jarvis.operations.TagesschauNews;
 import de.bach.thwildau.jarvis.operations.Time;
+import de.bach.thwildau.jarvis.operations.WeatherForecastBerlin;
 import de.bach.thwildau.jarvis.operations.WikipediaTracer;
 import de.bach.thwildau.jarvis.operations.Youtuber;
 
@@ -401,6 +402,14 @@ public class StartClient {
 				operations.put(prop.getProperty("question.verkehr.berlin" + String.valueOf(i)),
 						BerlinTraffic.getInstance(prop.getProperty("answer.verkehr.berlin")));
 			}
+			
+
+			// Wetter in Berlin
+			for(int i=1; i<2; i++){
+				operations.put(prop.getProperty("question.wetter.berlin" + String.valueOf(i)),
+						WeatherForecastBerlin.getInstance(prop.getProperty("answer.wetter.berlin")));
+			}
+		
 		
 			StartClient client = new StartClient(operations,prop);
 			client.start();
