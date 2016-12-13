@@ -35,6 +35,7 @@ import de.bach.thwildau.jarvis.operations.GameStarNews;
 import de.bach.thwildau.jarvis.operations.GameStarVideos;
 import de.bach.thwildau.jarvis.operations.GermanyTraffic;
 import de.bach.thwildau.jarvis.operations.JobTicker;
+import de.bach.thwildau.jarvis.operations.RbbNews;
 import de.bach.thwildau.jarvis.operations.TagesschauNews;
 import de.bach.thwildau.jarvis.operations.Time;
 import de.bach.thwildau.jarvis.operations.WeatherForecastBerlin;
@@ -333,92 +334,98 @@ public class StartClient {
 
 	/**
 	 * Main-Method
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		try {
 			InputStream stream = null;
 			stream = StartClient.class.getClassLoader().getResourceAsStream("string.properties");
-			
+
 			Properties prop = new Properties();
 			prop.load(stream);
-			
-			Map<String,Function> operations = new HashMap<>();
-			
+
+			Map<String, Function> operations = new HashMap<>();
+
 			// Time
-			for(int i=1;i<3;i++){
-				operations.put(prop.getProperty("question.time"+String.valueOf(i)), Time.getInstance(prop.getProperty("answer.time")));
+			for (int i = 1; i < 3; i++) {
+				operations.put(prop.getProperty("question.time" + String.valueOf(i)),
+						Time.getInstance(prop.getProperty("answer.time")));
 			}
-			
+
 			// Date
-			for(int i=1;i<4;i++){
-				operations.put(prop.getProperty("question.date"+String.valueOf(i)), DateToday.getInstance(prop.getProperty("answer.date")));
+			for (int i = 1; i < 4; i++) {
+				operations.put(prop.getProperty("question.date" + String.valueOf(i)),
+						DateToday.getInstance(prop.getProperty("answer.date")));
 			}
-			
+
 			// Gamestar-News
-			for(int i=1; i < 6 ; i++){
-				operations.put(prop.getProperty("question.gamestarnews"+String.valueOf(i)),
+			for (int i = 1; i < 6; i++) {
+				operations.put(prop.getProperty("question.gamestarnews" + String.valueOf(i)),
 						GameStarNews.getInstance(prop.getProperty("answer.gamestarnews")));
 			}
-			
+
 			// Gamestar-Videos
-			for(int i=1; i<3;i++){
-				operations.put(prop.getProperty("question.gamestarvideos"+String.valueOf(i)),
+			for (int i = 1; i < 3; i++) {
+				operations.put(prop.getProperty("question.gamestarvideos" + String.valueOf(i)),
 						GameStarVideos.getInstance(prop.getProperty("answer.gamestarvideos")));
 			}
-	
+
 			// Youtube
-			for(int i=1; i<6;i++){
-				operations.put(prop.getProperty("question.youtube"+String.valueOf(i)),
+			for (int i = 1; i < 6; i++) {
+				operations.put(prop.getProperty("question.youtube" + String.valueOf(i)),
 						Youtuber.getInstance(new StartClient()));
 			}
-			
+
 			// Wikipedia
-			for(int i=1; i < 5 ; i++){
-			operations.put(prop.getProperty("question.wikipedia"+String.valueOf(i)),
-					WikipediaTracer.getInstance(new StartClient()));
+			for (int i = 1; i < 5; i++) {
+				operations.put(prop.getProperty("question.wikipedia" + String.valueOf(i)),
+						WikipediaTracer.getInstance(new StartClient()));
 			}
-			
+
 			// Tagesschau
 			for (int i = 1; i < 22; i++) {
 				operations.put(prop.getProperty("question.tagesschaunews" + String.valueOf(i)),
 						TagesschauNews.getInstance(prop.getProperty("answer.tagesschau")));
 			}
-			
+
+			// Nachrichten des RBB
+			for (int i = 1; i < 9; i++) {
+				operations.put(prop.getProperty("question.rbbnews" + String.valueOf(i)),
+						RbbNews.getInstance(prop.getProperty("answer.rbb")));
+			}
+
 			// JobTicker
 			for (int i = 1; i < 11; i++) {
-					operations.put(prop.getProperty("question.job" + String.valueOf(i)),
-					JobTicker.getInstance(prop.getProperty("answer.job")));
+				operations.put(prop.getProperty("question.job" + String.valueOf(i)),
+						JobTicker.getInstance(prop.getProperty("answer.job")));
 			}
-			
+
 			// Verkehrsmeldungen Deutschland
-			for(int i=1; i<4; i++){
+			for (int i = 1; i < 4; i++) {
 				operations.put(prop.getProperty("question.verkehr.deutschland" + String.valueOf(i)),
 						GermanyTraffic.getInstance(prop.getProperty("answer.verkehr.deutschland")));
 			}
-			
+
 			// Verkehrsmeldungen Berlin
-			for(int i=1; i<4; i++){
+			for (int i = 1; i < 4; i++) {
 				operations.put(prop.getProperty("question.verkehr.berlin" + String.valueOf(i)),
 						BerlinTraffic.getInstance(prop.getProperty("answer.verkehr.berlin")));
 			}
-			
 
 			// Wetter in Berlin
-			for(int i=1; i<2; i++){
+			for (int i = 1; i < 2; i++) {
 				operations.put(prop.getProperty("question.wetter.berlin" + String.valueOf(i)),
 						WeatherForecastBerlin.getInstance(prop.getProperty("answer.wetter.berlin")));
 			}
-		
-		
-			StartClient client = new StartClient(operations,prop);
+
+			StartClient client = new StartClient(operations, prop);
 			client.start();
 		} catch (IOException e) {
 			System.err.println("Error reading Properties!");
 			e.printStackTrace();
 		}
-		
-	
+
 	}
 
 }
