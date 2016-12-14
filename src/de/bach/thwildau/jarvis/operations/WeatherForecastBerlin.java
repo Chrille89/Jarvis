@@ -83,26 +83,30 @@ public class WeatherForecastBerlin implements Function {
 			String day = array[4].replace("</big", "");
 			String tempFrom = array[22].replace("</font", "");
 			String tempTo = array[24].replace("</font", "");
-			String weather = array[50].substring(array[50].indexOf("alt=")).replace("alt=", "").replace("'", "");
-			weatherList.add(day + " " + tempFrom + " bis" + " " + tempTo + " " + weather);
+			String weatherFrom = array[47].substring(array[47].indexOf("alt=")).replace("alt=", "").replace("'", "");
+			String weatherTo = array[50].substring(array[50].indexOf("alt=")).replace("alt=", "").replace("'", "");
+			weatherList.add(day + " " + tempFrom + " bis" + " " + tempTo + " " + weatherFrom+ " bis "+weatherTo);
 
 			day = array[8].replace("</big", "");
 			tempFrom = array[28].replace("</font", "");
 			tempTo = array[30].replace("</font", "");
-			weather = array[56].substring(array[56].indexOf("alt=")).replace("alt=", "").replace("'", "");
-			weatherList.add(day + " " + tempFrom + " bis" + " " + tempTo + " " + weather);
+			weatherFrom = array[53].substring(array[53].indexOf("alt=")).replace("alt=", "").replace("'", "");
+			weatherTo = array[56].substring(array[56].indexOf("alt=")).replace("alt=", "").replace("'", "");
+			weatherList.add(day + " " + tempFrom + " bis" + " " + tempTo + " "+weatherFrom+ " bis "+weatherTo);
 
 			day = array[12].replace("</big", "");
 			tempFrom = array[34].replace("</font", "");
 			tempTo = array[36].replace("</font", "");
-			weather = array[62].substring(array[62].indexOf("alt=")).replace("alt=", "").replace("'", "");
-			weatherList.add(day + " " + tempFrom + " bis" + " " + tempTo + " " + weather);
+			weatherFrom = array[59].substring(array[59].indexOf("alt=")).replace("alt=", "").replace("'", "");
+			weatherTo = array[62].substring(array[62].indexOf("alt=")).replace("alt=", "").replace("'", "");
+			weatherList.add(day + " " + tempFrom + " bis" + " " + tempTo + " " +weatherFrom+ " bis "+weatherTo);
 
 			day = array[16].replace("</big", "");
 			tempFrom = array[40].replace("</font", "");
 			tempTo = array[42].replace("</font", "");
-			weather = array[68].substring(array[68].indexOf("alt=")).replace("alt=", "").replace("'", "");
-			weatherList.add(day + " " + tempFrom + " bis" + " " + tempTo + " " + weather);
+			weatherFrom = array[65].substring(array[65].indexOf("alt=")).replace("alt=", "").replace("'", "");
+			weatherTo = array[68].substring(array[68].indexOf("alt=")).replace("alt=", "").replace("'", "");
+			weatherList.add(day + " " + tempFrom + " bis" + " " + tempTo + " " +weatherFrom+ " bis "+weatherTo);
 
 			//System.out.println(weatherList);
 			break;
