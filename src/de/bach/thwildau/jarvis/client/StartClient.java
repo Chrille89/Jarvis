@@ -35,6 +35,7 @@ import de.bach.thwildau.jarvis.operations.GameStarNews;
 import de.bach.thwildau.jarvis.operations.GameStarVideos;
 import de.bach.thwildau.jarvis.operations.GermanyTraffic;
 import de.bach.thwildau.jarvis.operations.JobTicker;
+import de.bach.thwildau.jarvis.operations.MailReader;
 import de.bach.thwildau.jarvis.operations.RbbNews;
 import de.bach.thwildau.jarvis.operations.TagesschauNews;
 import de.bach.thwildau.jarvis.operations.Time;
@@ -417,6 +418,12 @@ public class StartClient {
 			for (int i = 1; i < 2; i++) {
 				operations.put(prop.getProperty("question.wetter.berlin" + String.valueOf(i)),
 						WeatherForecastBerlin.getInstance(prop.getProperty("answer.wetter.berlin")));
+			}
+
+			// Wetter in Berlin
+			for (int i = 1; i < 2; i++) {
+				operations.put(prop.getProperty("question.email" + String.valueOf(i)),
+						MailReader.getInstance(prop.getProperty("answer.email")));
 			}
 
 			StartClient client = new StartClient(operations, prop);

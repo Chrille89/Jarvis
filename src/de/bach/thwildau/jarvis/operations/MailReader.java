@@ -29,8 +29,8 @@ public class MailReader implements Function{
 	
 	@Override
 	public String operate() {
+		 String emails ="";
 		 try {
-
 		      //create properties field
 		      Properties properties = new Properties();
 
@@ -52,21 +52,25 @@ public class MailReader implements Function{
 		      Message[] messages = emailFolder.getMessages();
 		      System.out.println("messages.length---" + messages.length);
 
-		      for (int i = 0, n = messages.length; i < n; i++) {
-		         Message message = messages[i];
-		         System.out.println("---------------------------------");
-		         System.out.println("Email Number " + (i + 1));
-		         System.out.println("Subject: " + message.getSubject());
-		         System.out.println("From: " + message.getFrom()[0]);
-		         System.out.println("Text: " + message.getContent().toString());
-		         System.out.println("Date: "+message.getReceivedDate());
-
+		      int index =  messages.length-1;
+		      int threshold = 0;
+		      
+		      while(index > 0 && threshold < 3){
+		    	  Message message = messages[index];
+			   
+			         if(message.getContentType().contains("text/plain")){
+			         emails+="Nachricht von: "+message.getFrom()[0]+" ... Betreff: "+message.getSubject()+" ... Text: "+ message.getContent().toString();
+			         emails+="\n";
+			         emails+="... ";
+			         threshold++;
+			         }
+			         index--;
 		      }
-
+		    
 		      //close the store and folder objects
 		      emailFolder.close(false);
 		      store.close();
-
+		     
 		      } catch (NoSuchProviderException e) {
 		         e.printStackTrace();
 		      } catch (MessagingException e) {
@@ -74,8 +78,7 @@ public class MailReader implements Function{
 		      } catch (Exception e) {
 		         e.printStackTrace();
 		      }
-
-		return null;
+		 return this.answer+" "+emails;
 	}
 
 }
