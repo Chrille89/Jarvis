@@ -12,7 +12,7 @@ public class WikipediaTracerTest {
 	public void testWikipediaTracer(){
 		WikipediaTracer tracer = WikipediaTracer.getInstance(new StartClient());
 		
-		tracer.startWikipediaRequest("Adolf Hitler");
+		tracer.startWikipediaRequest("Angela Merkel");
 		
 	}
 	

@@ -58,7 +58,7 @@ public class Youtuber implements Function {
 				e1.printStackTrace();
 			}
 
-			if (googleResponse.getResults().size() > 1) {
+			if (googleResponse.getResults().size() > 0) {
 				question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
 				System.out.println("Question: " + question);
 				if (question.equalsIgnoreCase("YouTube beenden")) {
@@ -69,7 +69,7 @@ public class Youtuber implements Function {
 				String cmd = "";
 				try {
 
-					File questionFile = new File("song.json");
+					File questionFile = new File("youtube/song.json");
 
 					if (questionFile.exists()) {
 						questionFile.delete();
@@ -84,14 +84,12 @@ public class Youtuber implements Function {
 					bufferedWriter.write(question);
 					bufferedWriter.close();
 
-					String file = question.replaceAll("\\s+", "") + ".mp4";
+					String file = question.replaceAll("\\s+", "");
 
-					System.out.println("I load it the youtube-File");
-					cmd = "./playYoutubeVideo.sh " + file;
+					cmd = "sudo ./playYoutubeVideo.sh " + file;
 					System.out.println("Execute Command " + cmd);
-
 					Runtime.getRuntime().exec(cmd).waitFor();
-
+					
 				} catch (IOException e) {
 					System.err.println("Error execute commando '" + cmd + "'");
 					e.printStackTrace();
@@ -103,6 +101,10 @@ public class Youtuber implements Function {
 			// es wurde nichts gesagt -> weiter bis 'YouTube beenden'
 			startYoutube(googleToken);
 		} else {
+			String failureMessage = "Ich konnte keine Verbindung zu Google aufnehmen! Die Gegenstelle meldet den Status-Code: "+response.getStatus();
+			client.writeAnswer(failureMessage);
+			client.writeLog("WARN", failureMessage);
+			System.out.println(response);
 			String newToken = client.getGoogleToken();
 			startYoutube(newToken);
 		}
