@@ -9,7 +9,7 @@ public class MailReaderTest {
 	@Test
 	public void testEmailReader(){
 		
-		MailReader.getInstance("Deine Mails:").operate();
+		System.out.println(MailReader.getInstance("Deine Mails:").operate());
 		
 	}
 }

@@ -1,5 +1,7 @@
 package de.bach.thwildau.jarvis.operations;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 
 import javax.mail.Folder;
@@ -29,7 +31,8 @@ public class MailReader implements Function{
 	
 	@Override
 	public String operate() {
-		 String emails ="";
+		 String emails ="\n";
+		 emails+="... ";
 		 try {
 		      //create properties field
 		      Properties properties = new Properties();
@@ -55,11 +58,25 @@ public class MailReader implements Function{
 		      int index =  messages.length-1;
 		      int threshold = 0;
 		      
-		      while(index > 0 && threshold < 3){
+		      SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.YYYY HH:MM");
+		      
+		      while(index > 0 && threshold < 10){
 		    	  Message message = messages[index];
 			   
 			         if(message.getContentType().contains("text/plain")){
-			         emails+="Nachricht von: "+message.getFrom()[0]+" ... Betreff: "+message.getSubject()+" ... Text: "+ message.getContent().toString();
+			        	 
+			         String subject = message.getSubject();
+			         
+			         String sentDate = formatter.format(message.getSentDate());
+			         emails+=sentDate;
+			         emails+=" ";
+			         
+			         if(subject.startsWith("[")){
+			        	 emails+=subject.substring(subject.indexOf("]")+1);
+			         } else {
+			        	 emails+=subject;
+			         }
+			        	 
 			         emails+="\n";
 			         emails+="... ";
 			         threshold++;
