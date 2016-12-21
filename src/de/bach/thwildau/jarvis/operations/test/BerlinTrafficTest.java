@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import de.bach.thwildau.jarvis.operations.BerlinTraffic;
 
-public class BerlinTrafficTest {
+class BerlinTrafficTest {
 
 	@Test
 	public void testBerlinTrafficRssFeed(){

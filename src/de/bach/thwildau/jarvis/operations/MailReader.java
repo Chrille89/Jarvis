@@ -11,12 +11,17 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
 
+import de.bach.thwildau.jarvis.logging.FileLogger;
+import de.bach.thwildau.jarvis.model.LogLevel;
+
 public class MailReader implements Function{
 	
 	private static MailReader instance;
 	private String answer = null;
+	private FileLogger logger;
 	
 	private MailReader(String answer) {
+		logger = FileLogger.getLogger(this.getClass().getSimpleName());
 		this.answer = answer;
 	}
 
@@ -69,7 +74,7 @@ public class MailReader implements Function{
 			         
 			         String sentDate = formatter.format(message.getSentDate());
 			         emails+=sentDate;
-			         emails+=" ";
+			         emails+=" ... ";
 			         
 			         if(subject.startsWith("[")){
 			        	 emails+=subject.substring(subject.indexOf("]")+1);
@@ -89,11 +94,11 @@ public class MailReader implements Function{
 		      store.close();
 		     
 		      } catch (NoSuchProviderException e) {
-		         e.printStackTrace();
+		    	  logger.log(LogLevel.WARN, "No Provider found to read Emails "+e.getStackTrace());
 		      } catch (MessagingException e) {
-		         e.printStackTrace();
+		    	  logger.log(LogLevel.WARN, "Error in process Email-Message! "+e.getStackTrace());
 		      } catch (Exception e) {
-		         e.printStackTrace();
+		    	  logger.log(LogLevel.WARN, "Unexpected Error! "+e.getStackTrace());
 		      }
 		 return this.answer+" "+emails;
 	}

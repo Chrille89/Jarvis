@@ -11,14 +11,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.bach.thwildau.jarvis.client.StartClient;
+import de.bach.thwildau.jarvis.logging.FileLogger;
 import de.bach.thwildau.jarvis.model.GoogleResponse;
+import de.bach.thwildau.jarvis.model.LogLevel;
 
 public class Youtuber implements Function {
 
 	private static Youtuber instance;
 	private StartClient client = null;
+	private FileLogger logger;
 
 	private Youtuber(StartClient client) {
+		logger = FileLogger.getLogger(this.getClass().getSimpleName());
 		this.client = client;
 	}
 
@@ -53,16 +57,15 @@ public class Youtuber implements Function {
 			try {
 				String strResponse = mapper.writeValueAsString(googleResponse);
 				System.out.println("Response: " + strResponse);
-			} catch (JsonProcessingException e1) {
-				System.err.println("Error parsing GoogleResponse-Class to JSON-Format!");
-				e1.printStackTrace();
+			} catch (JsonProcessingException e) {
+				logger.log(LogLevel.WARN, "Error in Parsing JSON! "+e.getStackTrace());
 			}
 
 			if (googleResponse.getResults().size() > 0) {
 				question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
-				System.out.println("Question: " + question);
+				logger.log(LogLevel.DEBUG, "Question: "+question);
 				if (question.equalsIgnoreCase("YouTube beenden")) {
-					System.out.println("Beende Youtube!");
+					logger.log(LogLevel.DEBUG, "Exit Youtube!");
 					return;
 				}
 
@@ -87,24 +90,22 @@ public class Youtuber implements Function {
 					String file = question.replaceAll("\\s+", "");
 
 					cmd = "sudo ./playYoutubeVideo.sh " + file;
-					System.out.println("Execute Command " + cmd);
+					logger.log(LogLevel.DEBUG, "Execute Command " + cmd);
 					Runtime.getRuntime().exec(cmd).waitFor();
 					
 				} catch (IOException e) {
-					System.err.println("Error execute commando '" + cmd + "'");
-					e.printStackTrace();
+					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+e.getStackTrace());
 				} catch (InterruptedException e) {
-					System.err.println("Error execute commando '" + cmd + "'");
-					e.printStackTrace();
+					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+e.getStackTrace());
 				}
 			}
 			// es wurde nichts gesagt -> weiter bis 'YouTube beenden'
 			startYoutube(googleToken);
 		} else {
 			String failureMessage = "Ich konnte keine Verbindung zu Google aufnehmen! Die Gegenstelle meldet den Status-Code: "+response.getStatus();
+			
+			logger.log(LogLevel.ERROR, failureMessage);
 			client.writeAnswer(failureMessage);
-			client.writeLog("WARN", failureMessage);
-			System.out.println(response);
 			String newToken = client.getGoogleToken();
 			startYoutube(newToken);
 		}

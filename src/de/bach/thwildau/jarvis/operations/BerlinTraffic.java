@@ -25,14 +25,19 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 
+import de.bach.thwildau.jarvis.logging.FileLogger;
+import de.bach.thwildau.jarvis.model.LogLevel;
+
 public class BerlinTraffic implements Function {
 
 	private static final String rssFeedUrl = "https://viz.berlin.de/rss/iv";
 	private static final String charset = "UTF-8";
 	private static BerlinTraffic instance;
 	private String answer = null;
+	private FileLogger logger;
 
 	private BerlinTraffic(String answer) {
+		logger = FileLogger.getLogger(this.getClass().getSimpleName());
 		this.answer = answer;
 		// Create a new trust manager that trust all certificates
 		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
@@ -53,7 +58,7 @@ public class BerlinTraffic implements Function {
 			sc.init(null, trustAllCerts, new java.security.SecureRandom());
 			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"Cannot create SSL-Context! "+e.getStackTrace());
 		}
 
 	}
@@ -83,8 +88,7 @@ public class BerlinTraffic implements Function {
 			try {
 				builder = factory.newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.log(LogLevel.WARN,"Cannot parse RSS-Document!"+e.getStackTrace());
 			}
 
 			InputStream is = new URL(feedUrlString).openConnection().getInputStream();
@@ -133,20 +137,15 @@ public class BerlinTraffic implements Function {
 
 			return news;
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Die URL ist falsch angegeben "+e.getStackTrace());
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Unbekanntes Argument! "+e.getStackTrace());
 		} catch (FeedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace());
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"SAX-Error! "+e.getStackTrace());
 		}
 		return "";
 	}

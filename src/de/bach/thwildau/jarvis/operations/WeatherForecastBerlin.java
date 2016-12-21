@@ -14,14 +14,19 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 
+import de.bach.thwildau.jarvis.logging.FileLogger;
+import de.bach.thwildau.jarvis.model.LogLevel;
+
 public class WeatherForecastBerlin implements Function {
 
 	private static final String rssFeedUrl = "http://www.wetter-vista.de/wettervorhersage/wetter-berlin-87.xml";
 	private static final String charset = "UTF-8";
 	private static WeatherForecastBerlin instance;
 	private String answer = null;
+	private FileLogger logger;
 
 	private WeatherForecastBerlin(String answer) {
+		logger = FileLogger.getLogger(this.getClass().getSimpleName());
 		this.answer = answer;
 	}
 
@@ -47,12 +52,10 @@ public class WeatherForecastBerlin implements Function {
 		InputStream is = null;
 		try {
 			is = new URL(feedUrlString).openConnection().getInputStream();
-		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (MalformedURLException e) {
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! The URL is wrong! "+e.getStackTrace());
+		} catch (IOException e) {
+			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace());
 		}
 		InputSource source = new InputSource(is);
 
@@ -61,11 +64,9 @@ public class WeatherForecastBerlin implements Function {
 		try {
 			feed = input.build(source);
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+e.getStackTrace());
 		} catch (FeedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace());
 		}
 		List<SyndEntryImpl> entries = feed.getEntries();
 

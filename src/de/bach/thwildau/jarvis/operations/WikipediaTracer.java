@@ -16,7 +16,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import de.bach.thwildau.jarvis.client.StartClient;
+import de.bach.thwildau.jarvis.logging.FileLogger;
 import de.bach.thwildau.jarvis.model.GoogleResponse;
+import de.bach.thwildau.jarvis.model.LogLevel;
 
 public class WikipediaTracer implements Function {
 
@@ -24,8 +26,10 @@ public class WikipediaTracer implements Function {
 
 	private static WikipediaTracer instance;
 	private StartClient client = null;
-
+	private FileLogger logger;
+	
 	private WikipediaTracer(StartClient client) {
+		logger = FileLogger.getLogger(this.getClass().getSimpleName());
 		this.client = client;
 	}
 
@@ -57,29 +61,26 @@ public class WikipediaTracer implements Function {
 		String result = "";
 		
 		if (response.getStatus() == 200) {
-			System.out.println("Google send Status 200 ;-)");
+			logger.log(LogLevel.DEBUG, "Google send Status 200 ;-)");
 			GoogleResponse googleResponse = response.readEntity(GoogleResponse.class);
 
 			ObjectMapper mapper = new ObjectMapper();
 			try {
 				String strResponse = mapper.writeValueAsString(googleResponse);
-				System.out.println("Response: " + strResponse);
-			} catch (JsonProcessingException e1) {
-				System.err.println("Error parsing GoogleResponse-Class to JSON-Format!");
-				e1.printStackTrace();
+			} catch (JsonProcessingException e) {
+				logger.log(LogLevel.WARN, "Error in Parsing JSON! "+e.getStackTrace());
 			}
 
 			if (googleResponse.getResults().size() > 0) {
 				question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
-				System.out.println("Question: " + question);
+				logger.log(LogLevel.DEBUG, "Question: "+question);
 				result = startWikipediaRequest(question);
 				return result;
 			}
 		} else {
 			// renew Token!
-			System.out.println("Google send: " + response.getStatus() + " :-(");
-			System.out.println(response);
-			client.writeLog("INFO: ", "Es ist ein Fehler in der Abarbeitung der Wikipedia-Abfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: " + response.getStatus());
+			logger.log(LogLevel.DEBUG, "Google send: " + response.getStatus() + " :-(");
+			logger.log(LogLevel.INFO, "Es ist ein Fehler in der Abarbeitung der Wikipedia-Abfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: " + response.getStatus());
 			client.writeAnswer("Es ist ein Fehler in der Abarbeitung der Wikipedia-Abfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: " + response.getStatus());
 		}
 		return result;
@@ -105,8 +106,7 @@ public class WikipediaTracer implements Function {
 			System.out.println(answer);
 			return answer;
 		} catch (Exception e) {
-			System.err.println("Error in Wikipedia-Request!");
-			e.printStackTrace();
+			logger.log(LogLevel.WARN, "Error in Wikipedia-Request!");
 		}
 		return null;
 

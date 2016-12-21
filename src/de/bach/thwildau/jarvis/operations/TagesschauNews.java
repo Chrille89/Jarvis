@@ -13,14 +13,19 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 
+import de.bach.thwildau.jarvis.logging.FileLogger;
+import de.bach.thwildau.jarvis.model.LogLevel;
+
 public class TagesschauNews implements Function {
 
 	private static final String rssFeedUrl = "http://www.tagesschau.de/xml/rss2";
 	private static final String charset = "UTF-8";
 	private static TagesschauNews instance;
 	private String answer = null;
-
+	private FileLogger logger;
+	
 	private TagesschauNews(String answer) {
+		logger = FileLogger.getLogger(this.getClass().getSimpleName());
 		this.answer = answer;
 	}
 
@@ -63,20 +68,15 @@ public class TagesschauNews implements Function {
 			
 			return news;
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! The URL is wrong! "+e.getStackTrace());
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+e.getStackTrace());
 		} catch (FeedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace());
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(LogLevel.WARN,"InterruptedException-Error! "+e.getStackTrace());
 		}
 		return "";
 	}
