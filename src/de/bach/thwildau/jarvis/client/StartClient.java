@@ -248,6 +248,7 @@ public class StartClient {
 					this.writeAnswer("Bis zum nächsten mal Christian! Ich hoffe wir reden später wieder?");
 					try {
 						Runtime.getRuntime().exec("./shutdown.sh").waitFor();
+						System.exit(0);
 					} catch (IOException e) {
 						logger.log(LogLevel.ERROR, "Cannot shutdown! "+e.getStackTrace());
 					} catch (InterruptedException e) {
