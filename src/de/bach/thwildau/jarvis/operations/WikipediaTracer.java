@@ -65,11 +65,6 @@ public class WikipediaTracer implements Function {
 			GoogleResponse googleResponse = response.readEntity(GoogleResponse.class);
 
 			ObjectMapper mapper = new ObjectMapper();
-			try {
-				String strResponse = mapper.writeValueAsString(googleResponse);
-			} catch (JsonProcessingException e) {
-				logger.log(LogLevel.WARN, "Error in Parsing JSON! "+e.getStackTrace());
-			}
 
 			if (googleResponse.getResults().size() > 0) {
 				question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
@@ -106,7 +101,7 @@ public class WikipediaTracer implements Function {
 			System.out.println(answer);
 			return answer;
 		} catch (Exception e) {
-			logger.log(LogLevel.WARN, "Error in Wikipedia-Request!");
+			logger.log(LogLevel.WARN, "Error in Wikipedia-Request! "+e.getStackTrace().toString());
 		}
 		return null;
 

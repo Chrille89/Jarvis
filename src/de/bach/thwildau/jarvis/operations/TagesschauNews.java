@@ -68,15 +68,15 @@ public class TagesschauNews implements Function {
 			
 			return news;
 		} catch (MalformedURLException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! The URL is wrong! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! The URL is wrong! "+e.getStackTrace().toString());
 		} catch (IllegalArgumentException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+e.getStackTrace().toString());
 		} catch (FeedException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace().toString());
 		} catch (IOException e) {
-			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace().toString());
 		} catch (InterruptedException e) {
-			logger.log(LogLevel.WARN,"InterruptedException-Error! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"InterruptedException-Error! "+e.getStackTrace().toString());
 		}
 		return "";
 	}

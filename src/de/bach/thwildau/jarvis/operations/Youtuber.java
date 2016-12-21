@@ -58,7 +58,7 @@ public class Youtuber implements Function {
 				String strResponse = mapper.writeValueAsString(googleResponse);
 				System.out.println("Response: " + strResponse);
 			} catch (JsonProcessingException e) {
-				logger.log(LogLevel.WARN, "Error in Parsing JSON! "+e.getStackTrace());
+				logger.log(LogLevel.WARN, "Error in Parsing JSON! "+e.getStackTrace().toString());
 			}
 
 			if (googleResponse.getResults().size() > 0) {
@@ -94,9 +94,9 @@ public class Youtuber implements Function {
 					Runtime.getRuntime().exec(cmd).waitFor();
 					
 				} catch (IOException e) {
-					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+e.getStackTrace());
+					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+e.getStackTrace().toString());
 				} catch (InterruptedException e) {
-					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+e.getStackTrace());
+					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+e.getStackTrace().toString());
 				}
 			}
 			// es wurde nichts gesagt -> weiter bis 'YouTube beenden'

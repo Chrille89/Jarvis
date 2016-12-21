@@ -58,7 +58,7 @@ public class BerlinTraffic implements Function {
 			sc.init(null, trustAllCerts, new java.security.SecureRandom());
 			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 		} catch (Exception e) {
-			logger.log(LogLevel.WARN,"Cannot create SSL-Context! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot create SSL-Context! "+e.getStackTrace().toString());
 		}
 
 	}
@@ -88,7 +88,7 @@ public class BerlinTraffic implements Function {
 			try {
 				builder = factory.newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
-				logger.log(LogLevel.WARN,"Cannot parse RSS-Document!"+e.getStackTrace());
+				logger.log(LogLevel.WARN,"Cannot parse RSS-Document!"+e.getStackTrace().toString());
 			}
 
 			InputStream is = new URL(feedUrlString).openConnection().getInputStream();
@@ -137,15 +137,15 @@ public class BerlinTraffic implements Function {
 
 			return news;
 		} catch (MalformedURLException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Die URL ist falsch angegeben "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Die URL ist falsch angegeben "+e.getStackTrace().toString());
 		} catch (IllegalArgumentException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Unbekanntes Argument! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Unbekanntes Argument! "+e.getStackTrace().toString());
 		} catch (FeedException e) {
 			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace());
 		} catch (IOException e) {
-			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace().toString());
 		} catch (SAXException e) {
-			logger.log(LogLevel.WARN,"SAX-Error! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"SAX-Error! "+e.getStackTrace().toString());
 		}
 		return "";
 	}

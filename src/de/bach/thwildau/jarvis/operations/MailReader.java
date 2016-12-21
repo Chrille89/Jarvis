@@ -94,11 +94,11 @@ public class MailReader implements Function{
 		      store.close();
 		     
 		      } catch (NoSuchProviderException e) {
-		    	  logger.log(LogLevel.WARN, "No Provider found to read Emails "+e.getStackTrace());
+		    	  logger.log(LogLevel.WARN, "No Provider found to read Emails "+e.getStackTrace().toString());
 		      } catch (MessagingException e) {
-		    	  logger.log(LogLevel.WARN, "Error in process Email-Message! "+e.getStackTrace());
+		    	  logger.log(LogLevel.WARN, "Error in process Email-Message! "+e.getStackTrace().toString());
 		      } catch (Exception e) {
-		    	  logger.log(LogLevel.WARN, "Unexpected Error! "+e.getStackTrace());
+		    	  logger.log(LogLevel.WARN, "Unexpected Error! "+e.getStackTrace().toString());
 		      }
 		 return this.answer+" "+emails;
 	}

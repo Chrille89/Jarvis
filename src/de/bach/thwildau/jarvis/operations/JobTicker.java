@@ -68,13 +68,13 @@ public class JobTicker implements Function{
 			}	
 			return news;
 		} catch (MalformedURLException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Wrong URL! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Wrong URL! "+e.getStackTrace().toString());
 		} catch (IllegalArgumentException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+e.getStackTrace().toString());
 		} catch (FeedException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace().toString());
 		} catch (IOException e) {
-			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace().toString());
 		}
 		return "";
 	}
