@@ -69,6 +69,7 @@ public class StartClient {
 	}
 
 	public StartClient() {
+		logger = FileLogger.getLogger(this.getClass().getSimpleName());
 	}
 
 	/**
