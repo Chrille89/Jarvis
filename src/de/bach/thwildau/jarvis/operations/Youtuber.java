@@ -37,17 +37,29 @@ public class Youtuber implements Function {
 
 	@Override
 	public String operate() {
-		String googleToken = client.getGoogleToken();
-		client.writeAnswer("Was möchtest du hören?");
-		startYoutube(googleToken);
+		
+		boolean restartYoutube = true;
+		
+		while(restartYoutube){
+			String token = client.getGoogleToken();
+			String audioCmd = client.recordingCommando();
+			Response response = client.startGoogleRequest(token, audioCmd);
+
+			while (response == null) {
+				try {
+					logger.log(LogLevel.DEBUG, "Response was null -> try again after 30 seconds...");
+					Thread.sleep(30000);
+				} catch (InterruptedException e) {
+					logger.log(LogLevel.ERROR, "Cannot sleep!" + e.getStackTrace().toString());
+				}
+			}
+			restartYoutube = startYoutube(response);
+		}
 		return "Youtuber wurde beendet!";
 	}
 
-	private void startYoutube(String googleToken) {
-		String strAudio = client.recordingCommando();
+	private boolean startYoutube(Response response) {
 		String question = "";
-
-		Response response = client.startGoogleRequest(googleToken, strAudio);
 
 		if (response.getStatus() == 200) {
 			System.out.println("Google send Status 200 ;-)");
@@ -66,7 +78,7 @@ public class Youtuber implements Function {
 				logger.log(LogLevel.DEBUG, "Question: "+question);
 				if (question.equalsIgnoreCase("YouTube beenden")) {
 					logger.log(LogLevel.DEBUG, "Exit Youtube!");
-					return;
+					return false;
 				}
 
 				String cmd = "";
@@ -99,15 +111,13 @@ public class Youtuber implements Function {
 					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+e.getStackTrace().toString());
 				}
 			}
-			// es wurde nichts gesagt -> weiter bis 'YouTube beenden'
-			startYoutube(googleToken);
+			return true;
 		} else {
 			String failureMessage = "Ich konnte keine Verbindung zu Google aufnehmen! Die Gegenstelle meldet den Status-Code: "+response.getStatus();
-			
 			logger.log(LogLevel.ERROR, failureMessage);
 			client.writeAnswer(failureMessage);
-			String newToken = client.getGoogleToken();
-			startYoutube(newToken);
+			return true;
+			
 		}
 
 	}
