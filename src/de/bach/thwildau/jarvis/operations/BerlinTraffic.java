@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.glassfish.jersey.internal.util.ExceptionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -58,7 +59,7 @@ public class BerlinTraffic implements Function {
 			sc.init(null, trustAllCerts, new java.security.SecureRandom());
 			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 		} catch (Exception e) {
-			logger.log(LogLevel.WARN,"Cannot create SSL-Context! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"Cannot create SSL-Context! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 
 	}
@@ -88,7 +89,7 @@ public class BerlinTraffic implements Function {
 			try {
 				builder = factory.newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
-				logger.log(LogLevel.WARN,"Cannot parse RSS-Document!"+e.getStackTrace().toString());
+				logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+ExceptionUtils.exceptionStackTraceAsString(e));
 			}
 
 			InputStream is = new URL(feedUrlString).openConnection().getInputStream();
@@ -137,15 +138,15 @@ public class BerlinTraffic implements Function {
 
 			return news;
 		} catch (MalformedURLException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Die URL ist falsch angegeben "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Die URL ist falsch angegeben "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (IllegalArgumentException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Unbekanntes Argument! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Unbekanntes Argument! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (FeedException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (IOException e) {
-			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"I/O-Error! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (SAXException e) {
-			logger.log(LogLevel.WARN,"SAX-Error! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"SAX-Error! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 		return "";
 	}

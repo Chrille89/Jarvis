@@ -7,13 +7,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.Scanner;
 
+import org.glassfish.jersey.internal.util.ExceptionUtils;
 import org.xml.sax.InputSource;
 
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
 
 import de.bach.thwildau.jarvis.logging.FileLogger;
 import de.bach.thwildau.jarvis.model.LogLevel;
@@ -77,13 +77,13 @@ public class GameStarVideos implements Function {
 			}
 			return news;
 		} catch (MalformedURLException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Wrong URL! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Wrong URL! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (IllegalArgumentException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (FeedException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (IOException e) {
-			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"I/O-Error! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 		return "";
 	}

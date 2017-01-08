@@ -22,6 +22,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.internal.util.ExceptionUtils;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -91,13 +93,13 @@ public class StartClient {
 			if (index > 100) {
 				try {
 					// warte 16 min.
-					logger.log(LogLevel.DEBUG, "Wait 16 Minutes...");
-					writeAnswer("Da du mich im Moment nicht brauchst, schalte ich jetzt für 15 Minuten ab!");
-					Thread.sleep(1000000);
+					logger.log(LogLevel.DEBUG, "Wait 60 Minutes...");
+					writeAnswer("Da du mich im Moment nicht brauchst, schalte ich jetzt für 60 Minuten ab!");
+					Thread.sleep(3600000);
 					index = 0;
 					token = getGoogleToken();
 				} catch (InterruptedException e) {
-					logger.log(LogLevel.ERROR, "Cannot renew GoogleToken!" + e.getStackTrace().toString());
+					logger.log(LogLevel.ERROR, "Cannot renew GoogleToken! " + ExceptionUtils.exceptionStackTraceAsString(e));
 				}
 			}
 
@@ -108,7 +110,7 @@ public class StartClient {
 				try {
 					Thread.sleep(30000);
 				} catch (InterruptedException e) {
-					logger.log(LogLevel.ERROR, "Cannot sleep!" + e.getStackTrace().toString());
+					logger.log(LogLevel.ERROR, "Cannot sleep! " + ExceptionUtils.exceptionStackTraceAsString(e));
 				}
 				index = 0;
 				audioCmd = recordingCommando();
@@ -140,7 +142,7 @@ public class StartClient {
 			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
-			logger.log(LogLevel.ERROR, "Error reading Token!" + e.getStackTrace().toString());
+			logger.log(LogLevel.ERROR, "Error reading Token! " + ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 		logger.log(LogLevel.DEBUG, "Done.");
 		return token;
@@ -157,9 +159,9 @@ public class StartClient {
 			logger.log(LogLevel.DEBUG, "Recording...");
 			Runtime.getRuntime().exec(cmd).waitFor();
 		} catch (IOException e) {
-			logger.log(LogLevel.ERROR, "Error recording!"+e.getStackTrace().toString());
+			logger.log(LogLevel.ERROR, "Error recording! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (InterruptedException e) {
-			logger.log(LogLevel.ERROR, "Error recording!"+e.getStackTrace().toString());
+			logger.log(LogLevel.ERROR, "Error recording! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 
 		// Audio-File lesen
@@ -177,8 +179,8 @@ public class StartClient {
 			scanner.close();
 			logger.log(LogLevel.DEBUG, "Done.");
 			return recordedStr;
-		} catch (FileNotFoundException e1) {
-			logger.log(LogLevel.ERROR, "Cannot convert Audio-Command into String! The File "+recordFile.getAbsolutePath()+ " don't exist!"+e1.getStackTrace().toString());
+		} catch (FileNotFoundException e) {
+			logger.log(LogLevel.ERROR, "Cannot convert Audio-Command into String! The File "+recordFile.getAbsolutePath()+ " don't exist! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 		return recordedStr;
 	}
@@ -203,8 +205,7 @@ public class StartClient {
 		try {
 			json = mapper.writeValueAsString(googleRequest);
 		} catch (JsonProcessingException e) {
-			logger.log(LogLevel.WARN, "Error parsing GoogleRequest-Class to JSON-Format! "+e.getStackTrace().toString());
-			System.err.println();
+			logger.log(LogLevel.WARN, "Error parsing GoogleRequest-Class to JSON-Format! "+ExceptionUtils.exceptionStackTraceAsString(e));
 			e.printStackTrace();
 		}
 
@@ -214,8 +215,7 @@ public class StartClient {
 
 			response = invocationBuilder.post(Entity.entity(json, MediaType.APPLICATION_JSON));
 		} catch (Exception e) {
-			logger.log(LogLevel.WARN, "Error in Request " + index + ". Try again..." + e.getStackTrace().toString());
-			return null;
+			logger.log(LogLevel.WARN, "Error in Request " + index + ". Try again... " + ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 
 		return response;
@@ -251,9 +251,9 @@ public class StartClient {
 						Runtime.getRuntime().exec("./shutdown.sh").waitFor();
 						System.exit(0);
 					} catch (IOException e) {
-						logger.log(LogLevel.ERROR, "Cannot shutdown! "+e.getStackTrace());
+						logger.log(LogLevel.ERROR, "Cannot shutdown! "+ExceptionUtils.exceptionStackTraceAsString(e));
 					} catch (InterruptedException e) {
-						logger.log(LogLevel.ERROR, "Cannot shutdown! "+e.getStackTrace());
+						logger.log(LogLevel.ERROR, "Cannot shutdown! "+ExceptionUtils.exceptionStackTraceAsString(e));
 					}
 				}
 				
@@ -262,9 +262,9 @@ public class StartClient {
 					try {
 						Runtime.getRuntime().exec("./reboot.sh").waitFor();
 					} catch (IOException e) {
-						logger.log(LogLevel.ERROR, "Cannot shutdown! "+e.getStackTrace());
+						logger.log(LogLevel.ERROR, "Cannot shutdown! "+ExceptionUtils.exceptionStackTraceAsString(e));
 					} catch (InterruptedException e) {
-						logger.log(LogLevel.ERROR, "Cannot shutdown! "+e.getStackTrace());
+						logger.log(LogLevel.ERROR, "Cannot shutdown! "+ExceptionUtils.exceptionStackTraceAsString(e));
 					}
 				}
 
@@ -290,7 +290,7 @@ public class StartClient {
 				Runtime.getRuntime().exec("./reboot.sh");
 			} catch (IOException e) {
 				errorMsg = "Neustarten fehlgeschlagen!";
-				logger.log(LogLevel.ERROR,errorMsg+e.getStackTrace().toString());
+				logger.log(LogLevel.ERROR,errorMsg+" "+ExceptionUtils.exceptionStackTraceAsString(e));
 				writeAnswer(errorMsg);
 				e.printStackTrace();
 			}
@@ -319,9 +319,9 @@ public class StartClient {
 			}
 			Runtime.getRuntime().exec(cmd).waitFor();
 		} catch (IOException e) {
-			logger.log(LogLevel.ERROR,"Error execute commando '" + cmd + "'"+e.getStackTrace().toString());
+			logger.log(LogLevel.ERROR,"Error execute commando '" + cmd + "' "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (InterruptedException e) {
-			logger.log(LogLevel.ERROR,"Error execute commando '" + cmd + "'"+e.getStackTrace().toString());
+			logger.log(LogLevel.ERROR,"Error execute commando '" + cmd + "' "+ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 
 	}

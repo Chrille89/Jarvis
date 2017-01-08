@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import org.glassfish.jersey.internal.util.ExceptionUtils;
 import org.xml.sax.InputSource;
 
 import com.sun.syndication.feed.synd.SyndEntryImpl;
@@ -68,15 +69,15 @@ public class TagesschauNews implements Function {
 			
 			return news;
 		} catch (MalformedURLException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! The URL is wrong! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! The URL is wrong! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (IllegalArgumentException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! Illegal Argument! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (FeedException e) {
-			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (IOException e) {
-			logger.log(LogLevel.WARN,"I/O-Error! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"I/O-Error! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (InterruptedException e) {
-			logger.log(LogLevel.WARN,"InterruptedException-Error! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN,"InterruptedException-Error! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 		return "";
 	}

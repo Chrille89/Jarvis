@@ -8,7 +8,6 @@ public class Time implements Function {
 	private String answer;
 	private static Time instance;
 	
-	
 	private Time(String answer){
 		this.answer = answer;
 	}
@@ -22,7 +21,6 @@ public class Time implements Function {
 		}
 	}
 	
-	
 	@Override
 	public String operate() {
 		Date date = new Date();
@@ -30,7 +28,5 @@ public class Time implements Function {
 		String formattedDate = formatter.format(date);
 		String answer = this.answer+" "+formattedDate;
 		return answer;
-		
 	}
-
 }

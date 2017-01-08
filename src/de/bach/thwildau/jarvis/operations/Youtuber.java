@@ -7,6 +7,8 @@ import java.io.IOException;
 
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.internal.util.ExceptionUtils;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,20 +39,20 @@ public class Youtuber implements Function {
 
 	@Override
 	public String operate() {
-		
 		boolean restartYoutube = true;
+		client.writeAnswer("Was möchtest du sehen?");
 		
 		while(restartYoutube){
 			String token = client.getGoogleToken();
 			String audioCmd = client.recordingCommando();
 			Response response = client.startGoogleRequest(token, audioCmd);
 
-			while (response == null) {
+			if(response == null){
 				try {
-					logger.log(LogLevel.DEBUG, "Response was null -> try again after 30 seconds...");
-					Thread.sleep(30000);
+					logger.log(LogLevel.DEBUG, "Response was null -> try again after 10 seconds...");
+					Thread.sleep(10000);
 				} catch (InterruptedException e) {
-					logger.log(LogLevel.ERROR, "Cannot sleep!" + e.getStackTrace().toString());
+					logger.log(LogLevel.ERROR, "Cannot sleep! " + ExceptionUtils.exceptionStackTraceAsString(e));
 				}
 			}
 			restartYoutube = startYoutube(response);
@@ -70,7 +72,7 @@ public class Youtuber implements Function {
 				String strResponse = mapper.writeValueAsString(googleResponse);
 				System.out.println("Response: " + strResponse);
 			} catch (JsonProcessingException e) {
-				logger.log(LogLevel.WARN, "Error in Parsing JSON! "+e.getStackTrace().toString());
+				logger.log(LogLevel.WARN, "Error in Parsing JSON! "+ExceptionUtils.exceptionStackTraceAsString(e));
 			}
 
 			if (googleResponse.getResults().size() > 0) {
@@ -106,9 +108,9 @@ public class Youtuber implements Function {
 					Runtime.getRuntime().exec(cmd).waitFor();
 					
 				} catch (IOException e) {
-					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+e.getStackTrace().toString());
+					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+ExceptionUtils.exceptionStackTraceAsString(e));
 				} catch (InterruptedException e) {
-					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+e.getStackTrace().toString());
+					logger.log(LogLevel.WARN, "Error execute commando '" + cmd + "' "+ExceptionUtils.exceptionStackTraceAsString(e));
 				}
 			}
 			return true;
@@ -116,10 +118,7 @@ public class Youtuber implements Function {
 			String failureMessage = "Ich konnte keine Verbindung zu Google aufnehmen! Die Gegenstelle meldet den Status-Code: "+response.getStatus();
 			logger.log(LogLevel.ERROR, failureMessage);
 			client.writeAnswer(failureMessage);
-			return true;
-			
+			return true;	
 		}
-
 	}
-
 }

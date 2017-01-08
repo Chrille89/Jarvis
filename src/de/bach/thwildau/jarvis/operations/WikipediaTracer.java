@@ -9,6 +9,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.internal.util.ExceptionUtils;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
@@ -101,7 +103,7 @@ public class WikipediaTracer implements Function {
 			System.out.println(answer);
 			return answer;
 		} catch (Exception e) {
-			logger.log(LogLevel.WARN, "Error in Wikipedia-Request! "+e.getStackTrace().toString());
+			logger.log(LogLevel.WARN, "Error in Wikipedia-Request! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 		return null;
 

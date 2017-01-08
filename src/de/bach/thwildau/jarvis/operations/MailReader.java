@@ -11,6 +11,8 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
 
+import org.glassfish.jersey.internal.util.ExceptionUtils;
+
 import de.bach.thwildau.jarvis.logging.FileLogger;
 import de.bach.thwildau.jarvis.model.LogLevel;
 
@@ -94,11 +96,11 @@ public class MailReader implements Function{
 		      store.close();
 		     
 		      } catch (NoSuchProviderException e) {
-		    	  logger.log(LogLevel.WARN, "No Provider found to read Emails "+e.getStackTrace().toString());
+		    	  logger.log(LogLevel.WARN, "No Provider found to read Emails "+ExceptionUtils.exceptionStackTraceAsString(e));
 		      } catch (MessagingException e) {
-		    	  logger.log(LogLevel.WARN, "Error in process Email-Message! "+e.getStackTrace().toString());
+		    	  logger.log(LogLevel.WARN, "Error in process Email-Message! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		      } catch (Exception e) {
-		    	  logger.log(LogLevel.WARN, "Unexpected Error! "+e.getStackTrace().toString());
+		    	  logger.log(LogLevel.WARN, "Unexpected Error! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		      }
 		 return this.answer+" "+emails;
 	}
