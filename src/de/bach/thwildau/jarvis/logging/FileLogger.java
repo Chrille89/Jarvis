@@ -5,12 +5,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class FileLogger extends Logger {
 
 	private static FileLogger uniqueInstance;
 	
-	public FileLogger(String className){
+	private FileLogger(String className){
 		super(className);
 	}
 	
@@ -24,23 +27,31 @@ public class FileLogger extends Logger {
 	}
 	
 	private void writeLog(String message) {
-			File errorLogFile = new File("logs/error.log");
+			String errorLogFileName = "logs/error.log";
 
-			try {
-
+			
+				/*
 				if (!errorLogFile.exists()) {
 					errorLogFile.createNewFile();
+				}*/
+				
+				try {
+					message+="\n";
+				    Files.write(Paths.get(errorLogFileName), message.getBytes(), StandardOpenOption.APPEND);
+				  
+				}catch (IOException e) {
+					System.err.println("Das Log-File konnte nicht geschrieben werden!");
+					e.printStackTrace();
 				}
+				/*
 				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(errorLogFile), "UTF-8");
 				BufferedWriter buffWriter = new BufferedWriter(writer);
 
-				buffWriter.write(message);
+				buffWriter.append(message);
+				buffWriter.newLine();
 				buffWriter.close();
-				writer.close();
-			} catch (IOException e) {
-				System.err.println("Das Log-File konnte nicht geschrieben werden!");
-				e.printStackTrace();
-			}
+				writer.close();*/
+			
 	}
 	
 	@Override
