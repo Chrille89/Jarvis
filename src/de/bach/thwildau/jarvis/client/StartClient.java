@@ -42,6 +42,7 @@ import de.bach.thwildau.jarvis.operations.GermanyTraffic;
 import de.bach.thwildau.jarvis.operations.JobTicker;
 import de.bach.thwildau.jarvis.operations.MailReader;
 import de.bach.thwildau.jarvis.operations.RbbNews;
+import de.bach.thwildau.jarvis.operations.TVSpielfilmPrimeTime;
 import de.bach.thwildau.jarvis.operations.TagesschauNews;
 import de.bach.thwildau.jarvis.operations.Time;
 import de.bach.thwildau.jarvis.operations.WeatherForecastBerlin;
@@ -99,7 +100,8 @@ public class StartClient {
 					index = 0;
 					token = getGoogleToken();
 				} catch (InterruptedException e) {
-					logger.log(LogLevel.ERROR, "Cannot renew GoogleToken! " + ExceptionUtils.exceptionStackTraceAsString(e));
+					logger.log(LogLevel.ERROR,
+							"Cannot renew GoogleToken! " + ExceptionUtils.exceptionStackTraceAsString(e));
 				}
 			}
 
@@ -125,7 +127,6 @@ public class StartClient {
 		}
 	}
 
-
 	/*
 	 * Get a new Google-Token
 	 */
@@ -148,8 +149,6 @@ public class StartClient {
 		return token;
 	}
 
-	
-
 	/*
 	 * Recording the Commando.
 	 */
@@ -159,9 +158,9 @@ public class StartClient {
 			logger.log(LogLevel.DEBUG, "Recording...");
 			Runtime.getRuntime().exec(cmd).waitFor();
 		} catch (IOException e) {
-			logger.log(LogLevel.ERROR, "Error recording! "+ExceptionUtils.exceptionStackTraceAsString(e));
+			logger.log(LogLevel.ERROR, "Error recording! " + ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (InterruptedException e) {
-			logger.log(LogLevel.ERROR, "Error recording! "+ExceptionUtils.exceptionStackTraceAsString(e));
+			logger.log(LogLevel.ERROR, "Error recording! " + ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 
 		// Audio-File lesen
@@ -180,7 +179,8 @@ public class StartClient {
 			logger.log(LogLevel.DEBUG, "Done.");
 			return recordedStr;
 		} catch (FileNotFoundException e) {
-			logger.log(LogLevel.ERROR, "Cannot convert Audio-Command into String! The File "+recordFile.getAbsolutePath()+ " don't exist! "+ExceptionUtils.exceptionStackTraceAsString(e));
+			logger.log(LogLevel.ERROR, "Cannot convert Audio-Command into String! The File "
+					+ recordFile.getAbsolutePath() + " don't exist! " + ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 		return recordedStr;
 	}
@@ -205,7 +205,8 @@ public class StartClient {
 		try {
 			json = mapper.writeValueAsString(googleRequest);
 		} catch (JsonProcessingException e) {
-			logger.log(LogLevel.WARN, "Error parsing GoogleRequest-Class to JSON-Format! "+ExceptionUtils.exceptionStackTraceAsString(e));
+			logger.log(LogLevel.WARN, "Error parsing GoogleRequest-Class to JSON-Format! "
+					+ ExceptionUtils.exceptionStackTraceAsString(e));
 			e.printStackTrace();
 		}
 
@@ -215,7 +216,8 @@ public class StartClient {
 
 			response = invocationBuilder.post(Entity.entity(json, MediaType.APPLICATION_JSON));
 		} catch (Exception e) {
-			logger.log(LogLevel.WARN, "Error in Request " + index + ". Try again... " + ExceptionUtils.exceptionStackTraceAsString(e));
+			logger.log(LogLevel.WARN,
+					"Error in Request " + index + ". Try again... " + ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 
 		return response;
@@ -236,14 +238,14 @@ public class StartClient {
 
 			if (googleResponse.getResults().size() == 1) {
 				String question = googleResponse.getResults().get(0).getAlternatives().get(0).getTranscript();
-				logger.log(LogLevel.DEBUG, "Question: "+question);
+				logger.log(LogLevel.DEBUG, "Question: " + question);
 
 				// Sprachsteuerung beenden
 				if (question.equals("Sprachsteuerung deaktivieren")) {
 					this.writeAnswer("Bis zum nächsten mal Christian! Ich hoffe wir reden später wieder?");
 					System.exit(0);
 				}
-				
+
 				// Herunterfahren
 				if (question.equals("herunterfahren")) {
 					this.writeAnswer("Bis zum nächsten mal Christian! Ich hoffe wir reden später wieder?");
@@ -251,20 +253,20 @@ public class StartClient {
 						Runtime.getRuntime().exec("./shutdown.sh").waitFor();
 						System.exit(0);
 					} catch (IOException e) {
-						logger.log(LogLevel.ERROR, "Cannot shutdown! "+ExceptionUtils.exceptionStackTraceAsString(e));
+						logger.log(LogLevel.ERROR, "Cannot shutdown! " + ExceptionUtils.exceptionStackTraceAsString(e));
 					} catch (InterruptedException e) {
-						logger.log(LogLevel.ERROR, "Cannot shutdown! "+ExceptionUtils.exceptionStackTraceAsString(e));
+						logger.log(LogLevel.ERROR, "Cannot shutdown! " + ExceptionUtils.exceptionStackTraceAsString(e));
 					}
 				}
-				
+
 				if (question.equals("neu starten")) {
 					this.writeAnswer("Ich starte jetzt neu!");
 					try {
 						Runtime.getRuntime().exec("./reboot.sh").waitFor();
 					} catch (IOException e) {
-						logger.log(LogLevel.ERROR, "Cannot shutdown! "+ExceptionUtils.exceptionStackTraceAsString(e));
+						logger.log(LogLevel.ERROR, "Cannot shutdown! " + ExceptionUtils.exceptionStackTraceAsString(e));
 					} catch (InterruptedException e) {
-						logger.log(LogLevel.ERROR, "Cannot shutdown! "+ExceptionUtils.exceptionStackTraceAsString(e));
+						logger.log(LogLevel.ERROR, "Cannot shutdown! " + ExceptionUtils.exceptionStackTraceAsString(e));
 					}
 				}
 
@@ -280,17 +282,18 @@ public class StartClient {
 			}
 		} else {
 			// renew Token!
-			logger.log(LogLevel.DEBUG,"Google send: " + response.getStatus() + " :-(");
+			logger.log(LogLevel.DEBUG, "Google send: " + response.getStatus() + " :-(");
 			System.out.println(response);
 			errorMsg = "Es ist ein Fehler in der Abarbeitung der " + index
-					+ ".HTTP-Anfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: " + response.getStatus()+"! Ich starte jetzt neu !";
-			logger.log(LogLevel.WARN,errorMsg);
+					+ ".HTTP-Anfrage aufgetreten! Die Gegenstelle meldet den Fehler-Code: " + response.getStatus()
+					+ "! Ich starte jetzt neu !";
+			logger.log(LogLevel.WARN, errorMsg);
 			writeAnswer(errorMsg);
 			try {
 				Runtime.getRuntime().exec("./reboot.sh");
 			} catch (IOException e) {
 				errorMsg = "Neustarten fehlgeschlagen!";
-				logger.log(LogLevel.ERROR,errorMsg+" "+ExceptionUtils.exceptionStackTraceAsString(e));
+				logger.log(LogLevel.ERROR, errorMsg + " " + ExceptionUtils.exceptionStackTraceAsString(e));
 				writeAnswer(errorMsg);
 				e.printStackTrace();
 			}
@@ -319,9 +322,11 @@ public class StartClient {
 			}
 			Runtime.getRuntime().exec(cmd).waitFor();
 		} catch (IOException e) {
-			logger.log(LogLevel.ERROR,"Error execute commando '" + cmd + "' "+ExceptionUtils.exceptionStackTraceAsString(e));
+			logger.log(LogLevel.ERROR,
+					"Error execute commando '" + cmd + "' " + ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (InterruptedException e) {
-			logger.log(LogLevel.ERROR,"Error execute commando '" + cmd + "' "+ExceptionUtils.exceptionStackTraceAsString(e));
+			logger.log(LogLevel.ERROR,
+					"Error execute commando '" + cmd + "' " + ExceptionUtils.exceptionStackTraceAsString(e));
 		}
 
 	}
@@ -418,6 +423,9 @@ public class StartClient {
 				operations.put(prop.getProperty("question.email" + String.valueOf(i)),
 						MailReader.getInstance(prop.getProperty("answer.email")));
 			}
+
+			operations.put(prop.getProperty("question.tvspielfilm.primetime"),
+					TVSpielfilmPrimeTime.getInstance(prop.getProperty("answer.tvspielfilm")));
 
 			StartClient client = new StartClient(operations, prop);
 			client.start();
