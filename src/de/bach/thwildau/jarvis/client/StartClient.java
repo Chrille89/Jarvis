@@ -21,6 +21,7 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.validation.Schema;
 
 import org.glassfish.jersey.internal.util.ExceptionUtils;
 
@@ -42,6 +43,7 @@ import de.bach.thwildau.jarvis.operations.GermanyTraffic;
 import de.bach.thwildau.jarvis.operations.JobTicker;
 import de.bach.thwildau.jarvis.operations.MailReader;
 import de.bach.thwildau.jarvis.operations.RbbNews;
+import de.bach.thwildau.jarvis.operations.SchlagerStream;
 import de.bach.thwildau.jarvis.operations.TVSpielfilmPrimeTime;
 import de.bach.thwildau.jarvis.operations.TagesschauNews;
 import de.bach.thwildau.jarvis.operations.Time;
@@ -122,7 +124,10 @@ public class StartClient {
 
 			String answer = handleRequest(response);
 			logger.log(LogLevel.DEBUG, answer);
-			this.writeAnswer(answer);
+			
+			if(answer != null){
+				this.writeAnswer(answer);
+			}
 			index++;
 		}
 	}
@@ -427,6 +432,10 @@ public class StartClient {
 			operations.put(prop.getProperty("question.tvspielfilm.primetime"),
 					TVSpielfilmPrimeTime.getInstance(prop.getProperty("answer.tvspielfilm")));
 
+			operations.put(prop.getProperty("question.schlager.stream"),
+					SchlagerStream.getInstance(null));
+
+			
 			StartClient client = new StartClient(operations, prop);
 			client.start();
 		} catch (IOException e) {
