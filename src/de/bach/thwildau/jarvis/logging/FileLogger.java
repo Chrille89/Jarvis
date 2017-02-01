@@ -12,66 +12,49 @@ import java.nio.file.StandardOpenOption;
 public class FileLogger extends Logger {
 
 	private static FileLogger uniqueInstance;
-	
-	private FileLogger(String className){
+
+	private FileLogger(String className) {
 		super(className);
 	}
-	
-	public static FileLogger getLogger(String className){
-		if(uniqueInstance == null){
+
+	public static FileLogger getLogger(String className) {
+		if (uniqueInstance == null) {
 			uniqueInstance = new FileLogger(className);
 			return uniqueInstance;
 		}
 		return uniqueInstance;
-		
+
 	}
-	
+
 	private void writeLog(String message) {
-			String errorLogFileName = "logs/error.log";
+		String errorLogFileName = "logs/error.log";
 
-			
-				/*
-				if (!errorLogFile.exists()) {
-					errorLogFile.createNewFile();
-				}*/
-				
-				try {
-					message+="\n";
-				    Files.write(Paths.get(errorLogFileName), message.getBytes(), StandardOpenOption.APPEND);
-				  
-				}catch (IOException e) {
-					System.err.println("Das Log-File konnte nicht geschrieben werden!");
-					e.printStackTrace();
-				}
-				/*
-				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(errorLogFile), "UTF-8");
-				BufferedWriter buffWriter = new BufferedWriter(writer);
+		try {
+			message += "\n";
+			Files.write(Paths.get(errorLogFileName), message.getBytes(), StandardOpenOption.APPEND);
 
-				buffWriter.append(message);
-				buffWriter.newLine();
-				buffWriter.close();
-				writer.close();*/
-			
+		} catch (IOException e) {
+			System.err.println("Das Log-File konnte nicht geschrieben werden!");
+			e.printStackTrace();
+		}
 	}
-	
+
 	@Override
 	protected void info(String message) {
 		writeLog(message);
-		
+
 	}
 
 	@Override
 	protected void warn(String message) {
 		writeLog(message);
-		
+
 	}
 
 	@Override
 	protected void error(String message) {
 		writeLog(message);
-		
+
 	}
-	
-	
 
 }
