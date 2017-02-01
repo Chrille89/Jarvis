@@ -7,12 +7,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.nio.channels.FileLock;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
-import java.util.logging.Logger;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -21,7 +21,6 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.validation.Schema;
 
 import org.glassfish.jersey.internal.util.ExceptionUtils;
 
@@ -90,45 +89,22 @@ public class StartClient {
 	public void start() {
 		String token = getGoogleToken();
 		this.writeAnswer("Jetzt können wir reden!");
-		while (true) {
-			// playRecordingSound();
-
-			if (index > 100) {
-				try {
-					// warte 16 min.
-					logger.log(LogLevel.DEBUG, "Wait 60 Minutes...");
-					writeAnswer("Da du mich im Moment nicht brauchst, schalte ich jetzt für 60 Minuten ab!");
-					Thread.sleep(3600000);
-					index = 0;
-					token = getGoogleToken();
-				} catch (InterruptedException e) {
-					logger.log(LogLevel.ERROR,
-							"Cannot renew GoogleToken! " + ExceptionUtils.exceptionStackTraceAsString(e));
-				}
-			}
-
+		
+		LocalDateTime now = LocalDateTime.now();
+		
+		// start at 5 o'clock
+		while (now.getHour() > 5) {
+			now = LocalDateTime.now();
+			
 			String audioCmd = recordingCommando();
 			Response response = startGoogleRequest(token, audioCmd);
 
-			while (response == null) {
-				try {
-					Thread.sleep(30000);
-				} catch (InterruptedException e) {
-					logger.log(LogLevel.ERROR, "Cannot sleep! " + ExceptionUtils.exceptionStackTraceAsString(e));
-				}
-				index = 0;
-				audioCmd = recordingCommando();
-				token = getGoogleToken();
-				response = startGoogleRequest(token, audioCmd);
-			}
-
 			String answer = handleRequest(response);
 			logger.log(LogLevel.DEBUG, answer);
-			
-			if(answer != null){
+
+			if (answer != null) {
 				this.writeAnswer(answer);
 			}
-			index++;
 		}
 	}
 
@@ -222,7 +198,10 @@ public class StartClient {
 			response = invocationBuilder.post(Entity.entity(json, MediaType.APPLICATION_JSON));
 		} catch (Exception e) {
 			logger.log(LogLevel.WARN,
-					"Error in Request " + index + ". Try again... " + ExceptionUtils.exceptionStackTraceAsString(e));
+					"Error in Request " + index + ". Reboot!" + ExceptionUtils.exceptionStackTraceAsString(e));
+			this.writeAnswer("Google antwortet mir nicht! Ich starte mal neu...");
+			reboot();
+			
 		}
 
 		return response;
@@ -294,16 +273,21 @@ public class StartClient {
 					+ "! Ich starte jetzt neu !";
 			logger.log(LogLevel.WARN, errorMsg);
 			writeAnswer(errorMsg);
-			try {
-				Runtime.getRuntime().exec("./reboot.sh");
-			} catch (IOException e) {
-				errorMsg = "Neustarten fehlgeschlagen!";
-				logger.log(LogLevel.ERROR, errorMsg + " " + ExceptionUtils.exceptionStackTraceAsString(e));
-				writeAnswer(errorMsg);
-				e.printStackTrace();
-			}
+			reboot();
+			
 		}
 		return answer;
+	}
+
+	private void reboot() {
+		try {
+			Runtime.getRuntime().exec("./reboot.sh");
+		} catch (IOException e) {
+			String errorMsg = "Neustarten fehlgeschlagen!";
+			logger.log(LogLevel.ERROR, errorMsg + " " + ExceptionUtils.exceptionStackTraceAsString(e));
+			writeAnswer(errorMsg);
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -432,10 +416,8 @@ public class StartClient {
 			operations.put(prop.getProperty("question.tvspielfilm.primetime"),
 					TVSpielfilmPrimeTime.getInstance(prop.getProperty("answer.tvspielfilm")));
 
-			operations.put(prop.getProperty("question.schlager.stream"),
-					SchlagerStream.getInstance(null));
+			operations.put(prop.getProperty("question.schlager.stream"), SchlagerStream.getInstance(null));
 
-			
 			StartClient client = new StartClient(operations, prop);
 			client.start();
 		} catch (IOException e) {
