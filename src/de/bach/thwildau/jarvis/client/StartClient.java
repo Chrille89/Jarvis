@@ -40,9 +40,12 @@ import de.bach.thwildau.jarvis.operations.GameStarNews;
 import de.bach.thwildau.jarvis.operations.GameStarVideos;
 import de.bach.thwildau.jarvis.operations.GermanyTraffic;
 import de.bach.thwildau.jarvis.operations.JobTicker;
+import de.bach.thwildau.jarvis.operations.MaiTube;
 import de.bach.thwildau.jarvis.operations.MailReader;
 import de.bach.thwildau.jarvis.operations.RbbNews;
 import de.bach.thwildau.jarvis.operations.SchlagerStream;
+import de.bach.thwildau.jarvis.operations.StreamOf80th;
+import de.bach.thwildau.jarvis.operations.StreamOf90th;
 import de.bach.thwildau.jarvis.operations.TVSpielfilmPrimeTime;
 import de.bach.thwildau.jarvis.operations.TagesschauNews;
 import de.bach.thwildau.jarvis.operations.Time;
@@ -90,12 +93,7 @@ public class StartClient {
 		String token = getGoogleToken();
 		this.writeAnswer("Jetzt können wir reden!");
 		
-		LocalDateTime now = LocalDateTime.now();
-		
-		// start at 5 o'clock
-		while (now.getHour() > 5) {
-			now = LocalDateTime.now();
-			
+		while (true) {
 			String audioCmd = recordingCommando();
 			Response response = startGoogleRequest(token, audioCmd);
 
@@ -105,6 +103,7 @@ public class StartClient {
 			if (answer != null) {
 				this.writeAnswer(answer);
 			}
+			index++;
 		}
 	}
 
@@ -417,7 +416,13 @@ public class StartClient {
 					TVSpielfilmPrimeTime.getInstance(prop.getProperty("answer.tvspielfilm")));
 
 			operations.put(prop.getProperty("question.schlager.stream"), SchlagerStream.getInstance(null));
-
+			
+			operations.put(prop.getProperty("question.achtziger.stream"), StreamOf80th.getInstance(null));
+			
+			operations.put(prop.getProperty("question.neunziger.stream"), StreamOf90th.getInstance(null));
+			
+			operations.put(prop.getProperty("question.music.mai"), MaiTube.getInstance(null));
+		
 			StartClient client = new StartClient(operations, prop);
 			client.start();
 		} catch (IOException e) {
