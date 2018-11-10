@@ -61,7 +61,8 @@ public class TagesschauNews implements Function {
 
 			for (SyndEntryImpl feedEntry : entries) {
 				String description = feedEntry.getDescription().getValue();
-				news +=" ";
+				news += " ...";
+				news +="\n";
 				news += description;
 			}
 			
@@ -81,6 +82,6 @@ public class TagesschauNews implements Function {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(new TagesschauNews("Nachrichten: ").operate());
+		System.out.println(new TagesschauNews("Die Nachrichten: ").operate());
 	}
 }

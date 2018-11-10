@@ -1,0 +1,29 @@
+WeatherForecastBerlin 10.11.2018 18:11 WARN Cannot parse RSS-Document! com.sun.syndication.io.ParsingFeedException: Invalid XML: Error on line 151: The element type "meta" must be terminated by the matching end-tag "</meta>".
+	at com.sun.syndication.io.WireFeedInput.build(WireFeedInput.java:226)
+	at com.sun.syndication.io.SyndFeedInput.build(SyndFeedInput.java:136)
+	at de.bach.thwildau.jarvis.operations.WeatherForecastBerlin.loadRSSFeeds(WeatherForecastBerlin.java:67)
+	at de.bach.thwildau.jarvis.operations.WeatherForecastBerlin.operate(WeatherForecastBerlin.java:46)
+	at de.bach.thwildau.jarvis.operations.WeatherForecastBerlin.main(WeatherForecastBerlin.java:128)
+Caused by: org.jdom.input.JDOMParseException: Error on line 151: The element type "meta" must be terminated by the matching end-tag "</meta>".
+	at org.jdom.input.SAXBuilder.build(SAXBuilder.java:468)
+	at com.sun.syndication.io.WireFeedInput.build(WireFeedInput.java:222)
+	... 4 more
+Caused by: org.xml.sax.SAXParseException; lineNumber: 151; columnNumber: 3; The element type "meta" must be terminated by the matching end-tag "</meta>".
+	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
+	at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
+	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:400)
+	at com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.reportError(XMLErrorReporter.java:327)
+	at com.sun.org.apache.xerces.internal.impl.XMLScanner.reportFatalError(XMLScanner.java:1472)
+	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanEndElement(XMLDocumentFragmentScannerImpl.java:1749)
+	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl$FragmentContentDriver.next(XMLDocumentFragmentScannerImpl.java:2967)
+	at com.sun.org.apache.xerces.internal.impl.XMLDocumentScannerImpl.next(XMLDocumentScannerImpl.java:602)
+	at com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl.next(XMLNSDocumentScannerImpl.java:112)
+	at com.sun.org.apache.xerces.internal.impl.XMLDocumentFragmentScannerImpl.scanDocument(XMLDocumentFragmentScannerImpl.java:505)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:841)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:770)
+	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
+	at com.sun.org.apache.xerces.internal.parsers.AbstractSAXParser.parse(AbstractSAXParser.java:1213)
+	at com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser.parse(SAXParserImpl.java:643)
+	at org.jdom.input.SAXBuilder.build(SAXBuilder.java:453)
+	... 5 more
+

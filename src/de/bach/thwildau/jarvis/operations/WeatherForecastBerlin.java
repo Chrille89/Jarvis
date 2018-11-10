@@ -17,10 +17,11 @@ import com.sun.syndication.io.SyndFeedInput;
 
 import de.bach.thwildau.jarvis.logging.FileLogger;
 import de.bach.thwildau.jarvis.model.LogLevel;
+import sun.java2d.x11.X11SurfaceDataProxy.Opaque;
 
 public class WeatherForecastBerlin implements Function {
 
-	private static final String rssFeedUrl = "http://www.wetter-vista.de/wettervorhersage/wetter-berlin-87.xml";
+	private static final String rssFeedUrl = "http://www.wetter24.de/rss/";
 	private static final String charset = "UTF-8";
 	private static WeatherForecastBerlin instance;
 	private String answer = null;
@@ -121,6 +122,13 @@ public class WeatherForecastBerlin implements Function {
 		}
 
 		return news;
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(new WeatherForecastBerlin("Das Wetter in Berlin: ").operate());
+		
+		
+		
 	}
 
 }
