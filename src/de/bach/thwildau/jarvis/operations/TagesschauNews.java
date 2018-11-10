@@ -65,7 +65,7 @@ public class TagesschauNews implements Function {
 				news += description;
 			}
 			
-			Runtime.getRuntime().exec("./playTagesschauIntro.sh").waitFor();
+			//Runtime.getRuntime().exec("./playTagesschauIntro.sh").waitFor();
 			
 			return news;
 		} catch (MalformedURLException e) {
@@ -76,9 +76,11 @@ public class TagesschauNews implements Function {
 			logger.log(LogLevel.WARN,"Cannot parse RSS-Document! "+ExceptionUtils.exceptionStackTraceAsString(e));
 		} catch (IOException e) {
 			logger.log(LogLevel.WARN,"I/O-Error! "+ExceptionUtils.exceptionStackTraceAsString(e));
-		} catch (InterruptedException e) {
-			logger.log(LogLevel.WARN,"InterruptedException-Error! "+ExceptionUtils.exceptionStackTraceAsString(e));
-		}
+		} 
 		return "";
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(new TagesschauNews("Nachrichten: ").operate());
 	}
 }
